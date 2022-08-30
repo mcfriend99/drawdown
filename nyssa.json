@@ -1,0 +1,16 @@
+{
+  "name": "markdown", 
+  "version": "1.0.0", 
+  "description": "A light-weight Blade markdown library.", 
+  "homepage": "https://github.com/mcfriend99/markdown.git", 
+  "tags": [
+    "markdown", 
+    "parser"
+  ], 
+  "author": "Richard Ore <eqliqandfriends@gmail.com>", 
+  "license": "MIT", 
+  "sources": [
+    "127.0.0.1:3000"
+  ], 
+  "deps": {}
+}
