@@ -1,12 +1,37 @@
-# markdown
+# drawdown
 
-A light-weight Blade markdown library._n
-### Package Information
+Drawdown is a Markdown to HTML converter based on the [drawdown](https://github.com/adamvleggett/drawdown)  JavaScript library.
 
-- **Name:** markdown
-- **Version:**: 1.0.0
-- **Homepage:**: https://github.com/mcfriend99/markdown.git
-- **Tags:**: markdown, parser
-- **Author:**: Richard Ore <eqliqandfriends@gmail.com>
-- **License:**: MIT
+### Supported Features
 
+- Block quotes
+- Code blocks
+- Links
+- Images
+- Headings
+- Lists (including lettered lists)
+- Bold
+- Italic
+- Strikethrough
+- Monospace
+- Subscript
+- Horizontal rule
+- Tables
+- Automatic linking
+
+### Unsupported Features
+
+- Line blocks
+- Definition lists
+- Footnotes
+- Twitter/Facebook/YouTube embed
+- Inline math equations
+
+### Usage
+
+```
+import drawdown
+echo drawdown.markdown('# heading')
+```
+
+The above will output: `<h1>heading</h1>`.
