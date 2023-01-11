@@ -1,6 +1,6 @@
 {
   "name": "drawdown", 
-  "version": "1.0.0", 
+  "version": "1.0.1", 
   "description": "A Markdown to HTML converter.", 
   "homepage": "https://github.com/mcfriend99/drawdown", 
   "tags": [
