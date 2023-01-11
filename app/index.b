@@ -9,7 +9,7 @@ var rx_blockquote = '/\\n *&gt; *((.|\\n)*?)(?=(\\n|$){2})/'
 var rx_list = '/\\n( *)(?:[*\-+]|((\d+)|([a-z])|[A-Z])[.)]) +((.|\\n)*?)(?=(\\n|$){2})/'
 var rx_listjoin = '/<\/(ol|ul)>\\n\\n<\1>/'
 var rx_highlight = '/(^|[^A-Za-z\d\\\\])(([*_])|(~)|(\^)|(--)|(\+\+)|`)(\2?)([^<]*?)\2\8(?!\2)(?=\W|_|$)/s'
-var rx_code = '/\\n((```|~~~).*\\n?((.|\\n)*?)\\n?\\2|((    .*?\\n)+))/'
+var rx_code = '/\\n(((```|~~~).*\\n?((.|\\n)*?)\\n?\\3)|((    .*?\\n)+))/'
 var rx_link = '/((!?)\[(.*?)\]\((.*?)( ".*")?\)|\\\\([\\`*_{}\[\]()#+\-.!~]))/'
 var rx_table = '/\\n(( *\|.*?\| *\\n)+)/'
 var rx_thead = '/^.*\\n( *\|( *\:?-+\:?-+\:? *\|)* *\\n|)/'
@@ -143,6 +143,12 @@ def markdown(src) {
   src = src.replace(rx_gt, '&gt;')
   replace(rx_space, '  ')
 
+  # code
+  replace(rx_code, |all, p0, p1, p2, p3, p4, _, _1, _2| {
+    stash[si--] = element('pre', element('code', (p3 or p4).replace('/^    /', '')))
+    return si + '\uf8ff'
+  })
+
   # blockquote
   src = blockquote(src)
 
@@ -152,12 +158,6 @@ def markdown(src) {
   # list
   src = list(src)
   replace(rx_listjoin, '')
-
-  # code
-  replace(rx_code, |all, p1, p2, p3, p4, _, _1, _2| {
-    stash[si--] = element('pre', element('code', (p3 or p4).replace('/^    /', '')))
-    return si + '\uf8ff'
-  })
 
   # link or image
   replace(rx_link, |all, p1, p2, p3, p4, p5, p6| {
