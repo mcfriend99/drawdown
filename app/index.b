@@ -58,7 +58,9 @@ def draw_replace(str, pattern, fn) {
         when 12 replacement = fn(mc_len > i ? matches[0][i] : '', matches[1].length() > i ? matches[1][i] : '', matches[2].length() > i ? matches[2][i] : '', matches[3].length() > i ? matches[3][i] : '', matches[4].length() > i ? matches[4][i] : '', matches[5].length() > i ? matches[5][i] : '', matches[6].length() > i ? matches[6][i] : '', matches[7].length() > i ? matches[7][i] : '', matches[8].length() > i ? matches[8][i] : '', matches[9].length() > i ? matches[9][i] : '', matches[10].length() > i ? matches[10][i] : '', matches[11].length() > i ? matches[11][i] : '', str)
       }
 
-      str = str.replace(matches[0][i], replacement, false)
+      if matches and matches[0].length() > i {
+        str = str.replace(matches[0][i], replacement or '', false)
+      }
     }
   }
   return str
@@ -103,7 +105,7 @@ def markdown(src) {
       #   some command
       # in the content
       if type == 'code' and content.index_of('\n') > -1 {
-        content = '\n'.join(content.split('\n')[1,]).replace('/`+$/D', '')
+        content = '\n'.join(content.split('\n', false)[1,]).replace('/`+$/D', '')
       }
 
       return _ + element(type, highlight(content))
@@ -160,7 +162,7 @@ def markdown(src) {
   replace(rx_listjoin, '')
 
   # link or image
-  replace(rx_link, |all, p1, p2, p3, p4, p5, p6| {
+  replace(rx_link, |all, p1, p2, p3, p4, p5, p6, _| {
     stash[si--] = p4 ? (p2 ? 
       '<img src="' + p4 + '" alt="' + p3 + '"/>' : 
       '<a href="' + p4 + '">' + unesc(highlight(p3)) + '</a>') : 
@@ -184,13 +186,13 @@ def markdown(src) {
   src = src.replace('<tr>|<th>', '<tr><th>', false)
 
   # heading
-  replace(rx_heading, |all, _, p1, p2, _2| {
+  replace(rx_heading, |all, _, p1, p2, _2, _3| {
     return _ + element('h' + p1.length(), unesc(highlight(p2))) 
   })
 
   # paragraph
   replace(rx_para, |all, content, _| {
-    return element('p', unesc(highlight(content))) 
+    return element('p', unesc(highlight(content).trim()))
   })
 
   # stash
