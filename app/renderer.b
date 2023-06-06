@@ -261,7 +261,7 @@ class Renderer {
    * 
    * Renderer.render_inline_as_text(tokens, options, env)
    *
-   * Special kludge for image `alt` attributes to conform Common_mark spec.
+   * Special kludge for image `alt` attributes to conform CommonMark spec.
    * Don't try to use it! Spec requires to show `alt` content with stripped markup,
    * instead of simple escaping.
    * 

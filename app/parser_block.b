@@ -19,24 +19,25 @@ var _rules = [
 ]
 
 
-/** 
- * internal
+/**
  * 
- * class Parser_block
+ * class ParserBlock
  *
  * Block-level tokenizer.
+ * 
+ * @internal
  */
-class Parser_block {
+class ParserBlock {
 
   /**
-   * Parser_block#ruler
+   * ParserBlock#ruler
    *
    * [[Ruler]] instance. Keep configuration of block rules.
    * @type Ruler
    */
   var ruler = Ruler()
 
-  Parser_block() {
+  ParserBlock() {
     iter var i = 0; i < _rules.length(); i++ {
       self.ruler.push(_rules[i][0], _rules[i][1], { alt: (_rules[i].length() > 2 ? _rules[i][2] : [])[,] })
     }
@@ -109,7 +110,7 @@ class Parser_block {
   }
 
   /**
-   * Parser_block.parse(str, md, env, out_tokens)
+   * ParserBlock.parse(str, md, env, out_tokens)
    *
    * Process input string and push block tokens into `out_tokens`
    */
@@ -123,6 +124,6 @@ class Parser_block {
     self.tokenize(state, state.line, state.line_max)
   }
 
-  var State = block.state_block.State_block
+  var State = block.state_block.StateBlock
 }
 

@@ -29,7 +29,7 @@ def reference(state, start_line, _end_line, silent) {
   if state.src[pos] != '[' return false
 
   # Simple check to quickly interrupt scan on [link](url) at the start of line.
-  # Can be useful on practice: https:#github.com/markdown-it/markdown-it/issues/54
+  # Can be useful on practice: https://github.com/markdown-it/markdown-it/issues/54
   while pos++ < max {
     if state.src[pos] == ']' and state.src[pos - 1] != '\\' {
       if pos + 1 == max return false
@@ -171,7 +171,7 @@ def reference(state, start_line, _end_line, silent) {
 
   label = normalize_reference(str[1, label_end])
   if !label {
-    # Common_mark 0.20 disallows empty labels
+    # CommonMark 0.20 disallows empty labels
     return false
   }
 

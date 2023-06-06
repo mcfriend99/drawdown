@@ -3,7 +3,7 @@
 import ..token as _tkn
 import ..common.utils { is_white_space, is_punct_char, is_md_ascii_punct }
 
-class State_inline {
+class StateInline {
   
   /**
    * Stores { start: end } pairs. Useful for backtrack
@@ -37,7 +37,7 @@ class State_inline {
   var pending_level = 0
   var pos = 0
 
-  State_inline(src, md, env, out_tokens) {
+  StateInline(src, md, env, out_tokens) {
     self.src = src
     self.env = env
     self.md = md

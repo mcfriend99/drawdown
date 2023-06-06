@@ -8,7 +8,7 @@
 # !, ", #, $, %, &, ', (, ), *, +, ,, -, ., /, :, ;, <, =, >, ?, @, [, \, ], ^, _, `, {, |, }, or ~
 
 # !!!! Don't confuse with "Markdown ASCII Punctuation" chars
-# http:#spec.commonmark.org/0.15/#ascii-punctuation-character
+# http://spec.commonmark.org/0.15/#ascii-punctuation-character
 /* def _is_terminator_char(ch) {
   if is_string(ch) ch = ord(ch)
   using ch {
@@ -83,7 +83,7 @@ def text(state, silent) {
 # Alternative implementation, for memory.
 #
 # It costs 10% of performance, but allows extend terminators list, if place it
-# to `Parser_inline` property. Probably, will switch to it sometime, such
+# to `ParserInline` property. Probably, will switch to it sometime, such
 # flexibility required.
 
 

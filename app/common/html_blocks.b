@@ -1,5 +1,5 @@
 # List of valid html blocks names, accorting to commonmark spec
-# http://jgm.github.io/Common_mark/spec.html#html-blocks
+# http://jgm.github.io/CommonMark/spec.html#html-blocks
 
 var html_blocks = [
   'address',

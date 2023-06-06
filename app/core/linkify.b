@@ -86,7 +86,7 @@ def linkify(state) {
           url_text = links[ln].to_string()
 
           # Linkifier might send raw hostnames like "example.com", where url
-          # starts with domain name. So we prepend http:# in those cases,
+          # starts with domain name. So we prepend http:// in those cases,
           # and remove it afterwards.
           if !links[ln].schema {
             url_text = state.md.normalize_link_text('http://' + url_text).replace('/^http:\/\//', '')

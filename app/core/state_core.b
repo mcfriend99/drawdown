@@ -2,8 +2,8 @@
 
 import ..token as _tkn
 
-class State_core {
-  State_core(src, md, env) {
+class StateCore {
+  StateCore(src, md, env) {
     self.src = src
     self.env = env
     self.tokens = []

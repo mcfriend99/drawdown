@@ -5,7 +5,9 @@ var md = app.Markdown('commonmark')
 /* var start = microtime()
 file('test.html', 'w').write(md.render(file('test.md').read()))
 echo 'Completed in ${(microtime() - start) / 1000000}s' */
-/* var tests = json.decode(file('commonmark.0.30.json').read())
+
+
+var tests = json.decode(file('commonmark.0.30.json').read())
 
 describe('Markdown Test', @() {
   it('should all pass', @() {
@@ -13,8 +15,13 @@ describe('Markdown Test', @() {
       expect(md.render(test.markdown)).to_be(test.html)
     }
   })
-}) */
-echo md.render('<table><tr><td>\n<pre>\n**Hello**,\n\n_world_.\n</pre>\n</td></tr></table>\n')
+})
+
+
+# echo md.render('<table><tr><td>\n<pre>\n**Hello**,\n\n_world_.\n</pre>\n</td></tr></table>\n')
+
+
+
 /* echo md.render('
 ### [Footnotes](https://github.com/markdown-it/markdown-it-footnote)
 

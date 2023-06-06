@@ -14,32 +14,33 @@ var _rules = [
   [ 'text_join',      core.text_join     ]
 ]
 
-/** 
- * internal
+/**
  * 
- * class Core
+ * class ParserCore
  *
  * Top-level rules executor. Glues block/inline parsers and does intermediate
  * transformations.
+ * 
+ * @internal
  */
-class Parser_core {
+class ParserCore {
 
   /**
-   * Core#ruler
+   * ParserCore#ruler
    *
    * [[Ruler]] instance. Keep configuration of core rules.
    * @type Ruler
    */
   var ruler = Ruler()
 
-  Parser_core() {
+  ParserCore() {
     iter var i = 0; i < _rules.length(); i++ {
       self.ruler.push(_rules[i][0], _rules[i][1])
     }
   }
 
   /**
-   * Core.process(state)
+   * ParserCore.process(state)
    *
    * Executes core chain rules.
    */
@@ -53,6 +54,6 @@ class Parser_core {
     }
   }
 
-  var State = core.state_core.State_core
+  var State = core.state_core.StateCore
 }
 
