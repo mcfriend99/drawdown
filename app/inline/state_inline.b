@@ -8,12 +8,14 @@ class StateInline {
   /**
    * Stores { start: end } pairs. Useful for backtrack
    * optimization of pairs parse (emphasis, strikes).
+   * 
    * @type dict
    */
   var cache = {}
 
   /**
-   * List of emphasis-like delimiters for current tag
+   * List of emphasis-like delimiters for current tag.
+   * 
    * @type list
    */
   var delimiters = []
@@ -27,7 +29,8 @@ class StateInline {
 
   /**
    * Counter used to disable inline linkify execution
-   * inside <a> and markdown links
+   * inside <a> and markdown links.
+   * 
    * @type number
    */
   var link_level = 0
@@ -37,6 +40,9 @@ class StateInline {
   var pending_level = 0
   var pos = 0
 
+  /**
+   * @constructor
+   */
   StateInline(src, md, env, out_tokens) {
     self.src = src
     self.env = env
@@ -47,7 +53,9 @@ class StateInline {
   }
 
   /**
-   * Flush pending text
+   * Flush pending text.
+   * 
+   * @return {Token}
    */
   push_pending() {
     var token = _tkn.Token('text', '', 0)
@@ -96,8 +104,8 @@ class StateInline {
    * Scan a sequence of emphasis-like markers, and determine whether
    * it can start an emphasis sequence or end an emphasis sequence.
    * 
-   *   - start - position to scan from (it should point at a valid marker)
-   *   - can_split_word - determine if these markers can be found inside a word
+   *   - `start` - position to scan from (it should point at a valid marker)
+   *   - `can_split_word` - determine if these markers can be found inside a word
    */
   scan_delims(start, can_split_word) {
     var pos = start, last_char, nextChar, count, can_open, can_close,

@@ -91,8 +91,6 @@ def _get_encode_cache(exclude) {
 }
 
 /**
- * encode_url(string, exclude, keep_escaped)
- * 
  * Encode unsafe characters with percent-encoding, skipping already
  * encoded sequences.
  * 
@@ -181,8 +179,6 @@ def normalize_link_text(uri) {
 
 
 /**
- * class Markdown
- *
  * Main parser/renderer class.
  *
  * ##### Usage
@@ -257,8 +253,6 @@ class Markdown {
   var renderer = Renderer()
 
   /**
-   * validate_link(url)
-   *
    * Link validation function. CommonMark allows too much in links. By default
    * we disable `javascript:`, `vbscript:`, `file:` schemas, and almost all `data:...` schemas
    * except some embedded image types.
@@ -279,9 +273,7 @@ class Markdown {
   var validate_link = validate_link
 
   /**
-   * normalize_link(url)
-   *
-   * def used to encode link url to a machine-readable format,
+   * Function used to encode link url to a machine-readable format,
    * which includes url-encoding, punycode, etc.
    * 
    * @param {string} url
@@ -292,7 +284,7 @@ class Markdown {
   /**
    * normalize_link_text(url)
    *
-   * def used to decode link url to a human-readable format`
+   * Function used to decode link url to a human-readable format`
    * 
    * @param {string} url
    * @return string
@@ -323,8 +315,6 @@ class Markdown {
   }
 
   /**
-   * Markdown([preset_name [, options]])
-   *
    * Creates parser instanse with given config. Can be called without `new`.
    *
    * ##### preset_name:
@@ -434,8 +424,6 @@ class Markdown {
   }
 
   /**
-   * set(options)
-   *
    * Set parser options (in the same format as in constructor). Probably, you
    * will never need it, but you can change options after constructor call.
    *
@@ -462,8 +450,6 @@ class Markdown {
   }
 
   /**
-   * configure(presets)
-   *
    * Batch load of all options and compenent settings. This is internal method,
    * and you probably will not need it. But if you will - see available presets
    * and data structure [here](https://github.com/blade-lang/blade/tree/master/libs/markdown/presets)
@@ -503,8 +489,6 @@ class Markdown {
   }
 
   /**
-   * enable(list, ignore_invalid)
-   *
    * Enable list or rules. It will automatically find appropriate components,
    * containing rules with given names. If rule not found, and `ignore_invalid`
    * not set - throws exception.
@@ -543,8 +527,6 @@ class Markdown {
   }
 
   /**
-   * disable(list, ignore_invalid)
-   *
    * The same as [[Markdown.enable]], but turn specified rules off.
    * 
    * @param {string|list} list: rule name or list of rule names to disable.
@@ -572,8 +554,6 @@ class Markdown {
   }
 
   /**
-   * use(plugin, ...params)
-   *
    * Load specified plugin with given params into current parser instance.
    * It's just a sugar to call `plugin(md, params)` with curring.
    *
@@ -599,8 +579,6 @@ class Markdown {
   }
 
   /**
-   * parse(src, env)
-   *
    * Parse input string and return list of block tokens (special token type
    * "inline" will contain list of inline tokens). You should not call this
    * method directly, until you write custom renderer (for example, to produce
@@ -629,8 +607,6 @@ class Markdown {
   }
 
   /**
-   * render(src [, env])
-   *
    * Render markdown string into html. It does all magic for you :).
    *
    * `env` can be used to inject additional metadata (`{}` by default).
@@ -648,8 +624,6 @@ class Markdown {
   }
 
   /**
-   * parse_inline(src, env)
-   *
    * The same as [[Markdown.parse]] but skip all block rules. It returns the
    * block tokens list with the single `inline` element, containing parsed inline
    * tokens in `children` property. Also updates `env` object.
@@ -669,8 +643,6 @@ class Markdown {
   }
 
   /**
-   * render_inline(src [, env])
-   *
    * Similar to [[Markdown.render]] but for single paragraph content. Result
    * will NOT be wrapped into `<p>` tags.
    * 
@@ -686,8 +658,6 @@ class Markdown {
 }
 
 /**
- * markdown([preset_name [, options]])
- * 
  * Returns a new instance of class Markdown.
  * 
  * @param {string} preset_name: optional, `commonmark` / `zero`

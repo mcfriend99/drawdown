@@ -33,9 +33,6 @@ var _rules2 = [
 
 
 /**
- * 
- * class ParserInline
- *
  * Tokenizes paragraph content.
  * 
  * @internal
@@ -43,22 +40,23 @@ var _rules2 = [
 class ParserInline {
 
   /**
-   * ParserInline#ruler
-   *
    * [[Ruler]] instance. Keep configuration of core rules.
+   * 
    * @type Ruler
    */
   var ruler = Ruler()
 
   /**
-   * ParserInline#ruler2
-   * 
    *[[Ruler]] instance. Second ruler used for post-processing
    * (e.g. in emphasis-like rules).
+   * 
    * @type Ruler
    */
   var ruler2 = Ruler()
 
+  /**
+   * @constructor
+   */
   ParserInline() {
     iter var i = 0; i < _rules.length(); i++ {
       self.ruler.push(_rules[i][0], _rules[i][1])
@@ -160,9 +158,9 @@ class ParserInline {
   }
 
   /**
-   * ParserInline.parse(str, md, env, out_tokens)
-   *
-   * Process input string and push inline tokens into `out_tokens`
+   * Process input string and push inline tokens into `out_tokens`.
+   * 
+   * @internal
    */
   parse(str, md, env, out_tokens) {
     var i, rules, len

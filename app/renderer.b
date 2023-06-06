@@ -104,8 +104,6 @@ default_rules.html_inline = @(tokens, idx , options, env, slf) {
 }
 
 /**
- * class Renderer
- *
  * Generates HTML from parsed token stream. Each instance has independent
  * copy of rules. Those can be rewritten with ease. Also, you can add new
  * rules if you create plugin and adds new token types.
@@ -113,8 +111,6 @@ default_rules.html_inline = @(tokens, idx , options, env, slf) {
 class Renderer {
 
   /**
-   * Renderer#rules -> Dictionary
-   *
    * Contains render rules for tokens. Can be updated and extended.
    *
    * ##### Example
@@ -131,18 +127,21 @@ class Renderer {
    * Each rule is called as independent static function with fixed signature:
    *
    * ```blade
-   * function my_token_render(tokens, idx, options, env, renderer) {
+   * def my_token_render(tokens, idx, options, env, renderer) {
    *   # ...
    *   return rendered_hTML
    * }
    * ```
+   * 
+   * @type dict
    */
   var rules = assign({}, default_rules)
 
   /**
-   * Renderer.render_attrs(token) -> String
-   *
    * Render token attributes to string.
+   * 
+   * @param {Token} token
+   * @return string
    */
   render_attrs(token) {
     var i = 0, l, result
@@ -159,8 +158,6 @@ class Renderer {
   }
 
   /**
-   * Renderer.render_token(tokens, idx, options)
-   *
    * Default token renderer. Can be overriden by custom function
    * in [[Renderer#rules]].
    * 
@@ -229,8 +226,6 @@ class Renderer {
   }
 
   /**
-   * Renderer.render_inline(tokens, options, env)
-   *
    * The same as [[Renderer.render]], but for single token of `inline` type.
    * 
    * @param {list} tokens: list on block tokens to render
@@ -257,10 +252,7 @@ class Renderer {
     return result
   }
 
-  /** internal
-   * 
-   * Renderer.render_inline_as_text(tokens, options, env)
-   *
+  /**
    * Special kludge for image `alt` attributes to conform CommonMark spec.
    * Don't try to use it! Spec requires to show `alt` content with stripped markup,
    * instead of simple escaping.
@@ -269,6 +261,7 @@ class Renderer {
    * @param {dict} options: params of parser instance
    * @param {dict} env: additional data from parsed input (references, for example)
    * @return string
+   * @internal
    */
   render_inline_as_text(tokens, options, env) {
     var result = '', i = 0
@@ -287,8 +280,6 @@ class Renderer {
   }
 
   /**
-   * Renderer.render(tokens, options, env)
-   *
    * Takes token stream and generates HTML. Probably, you will never need to call
    * this method directly.
    * 

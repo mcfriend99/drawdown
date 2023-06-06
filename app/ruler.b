@@ -1,8 +1,6 @@
 import iters
 
 /**
- * class Ruler
- *
  * Helper class, used by [[markdown#core]], [[markdown#block]] and
  * [[markdown#inline]] to manage sequences of functions (rules):
  *
@@ -72,14 +70,8 @@ class Ruler {
   }
 
   /**
-   * Ruler.at(name, fn [, options])
-   *
    * Replace rule by name with new function & options. Dies error if name not
    * found.
-   * 
-   * @param {string} name: rule name to replace.
-   * @param {function} fn: new rule function.
-   * @param {dict} options: new rule options (optional).
    *
    * ##### Options:
    *
@@ -96,6 +88,10 @@ class Ruler {
    *   #...
    * })
    * ```
+   * 
+   * @param {string} name: rule name to replace.
+   * @param {function} fn: new rule function.
+   * @param {dict|nil} options: new rule options (optional).
    */
   at(name, fn, options) {
     var index = self.__find__(name)
@@ -109,15 +105,8 @@ class Ruler {
   }
 
   /**
-   * Ruler.before(before_name, rule_name, fn [, options])
-   *
    * Add new rule to chain before one with given name. See also
    * [[Ruler.after]], [[Ruler.push]].
-   * 
-   * @param {string} before_name: new rule will be added before this one.
-   * @param {string} rule_name: name of added rule.
-   * @param {function} fn: rule function.
-   * @param {dict} options: rule options (optional).
    *
    * ##### Options:
    *
@@ -132,6 +121,11 @@ class Ruler {
    *   #...
    * })
    * ```
+   * 
+   * @param {string} before_name: new rule will be added before this one.
+   * @param {string} rule_name: name of added rule.
+   * @param {function} fn: rule function.
+   * @param {dict|nil} options: rule options (optional).
    */
   before(before_name, rule_name, fn, options) {
     var index = self.__find__(before_name)
@@ -151,15 +145,8 @@ class Ruler {
   }
 
   /**
-   * Ruler.after(after_name, rule_name, fn [, options])
-   *
    * Add new rule to chain after one with given name. See also
    * [[Ruler.before]], [[Ruler.push]].
-   * 
-   * @param {string} after_name: new rule will be added after this one.
-   * @param {string} rule_name: name of added rule.
-   * @param {function} fn: rule function.
-   * @param {dict} options: rule options (optional).
    *
    * ##### Options:
    *
@@ -174,6 +161,11 @@ class Ruler {
    *   #...
    * })
    * ```
+   * 
+   * @param {string} after_name: new rule will be added after this one.
+   * @param {string} rule_name: name of added rule.
+   * @param {function} fn: rule function.
+   * @param {dict|nil} options: rule options (optional).
    */
   after(after_name, rule_name, fn, options) {
     var index = self.__find__(after_name)
@@ -193,14 +185,8 @@ class Ruler {
   }
 
   /**
-   * Ruler.push(rule_name, fn [, options])
-   *
    * Push new rule to the end of chain. See also
    * [[Ruler.before]], [[Ruler.after]].
-   * 
-   * @param {string} rule_name: name of added rule.
-   * @param {function} fn: rule function.
-   * @param {dict} options: rule options (optional).
    *
    * ##### Options:
    *
@@ -215,6 +201,10 @@ class Ruler {
    *   #...
    * })
    * ```
+   * 
+   * @param {string} rule_name: name of added rule.
+   * @param {function} fn: rule function.
+   * @param {dict|nil} options: rule options (optional).
    */
   push(rule_name, fn, options) {
     var opt = options or {}
@@ -230,8 +220,6 @@ class Ruler {
   }
 
   /**
-   * Ruler.enable(list [, ignore_invalid]) -> list
-   *
    * Enable rules with given names. If any rule name not found - dies Exception.
    * Errors can be disabled by second param.
    *
@@ -241,6 +229,7 @@ class Ruler {
    * 
    * @param {string|list} list: list of rule names to enable.
    * @param {bool} ignore_invalid: set `true` to ignore errors when rule not found.
+   * @return list
    */
   enable(list, ignore_invalid) {
     if !is_list(list) list = [ list ]
@@ -264,8 +253,6 @@ class Ruler {
   }
 
   /**
-   * Ruler.enable_only(list [, ignore_invalid])
-   *
    * Enable rules with given names, and disable everything else. If any rule name
    * not found - throw Error. Errors can be disabled by second param.
    *
@@ -282,8 +269,6 @@ class Ruler {
   }
 
   /**
-   * Ruler.disable(list [, ignore_invalid]) -> list
-   *
    * Disable rules with given names. If any rule name not found - throw Error.
    * Errors can be disabled by second param.
    *
@@ -293,6 +278,7 @@ class Ruler {
    * 
    * @param {string|list} list: list of rule names to disable.
    * @param {bool} ignore_invalid: set `true` to ignore errors when rule not found.
+   * @return list
    */
   disable(list, ignore_invalid) {
     if !is_list(list) list = [ list ]
@@ -316,13 +302,14 @@ class Ruler {
   }
 
   /**
-   * Ruler.get_rules(chain_name) -> list
-   *
    * Return list of active functions (rules) for given chain name. It analyzes
    * rules configuration, compiles caches if not exists and returns result.
    *
    * Default chain name is `''` (empty string). It can't be skipped. That's
    * done intentionally, to keep signature monomorphic for high speed.
+   * 
+   * @param {string} chain_name
+   * @return string
    **/
   get_rules(chain_name) {
     if self.__cache__ == nil {
