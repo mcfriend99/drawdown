@@ -37,7 +37,7 @@ var _rules2 = [
  * 
  * @internal
  */
-class ParserInline {
+class InlineParser {
 
   /**
    * [[Ruler]] instance. Keep configuration of core rules.
@@ -57,7 +57,7 @@ class ParserInline {
   /**
    * @constructor
    */
-  ParserInline() {
+  InlineParser() {
     iter var i = 0; i < _rules.length(); i++ {
       self.ruler.push(_rules[i][0], _rules[i][1])
     }
@@ -176,6 +176,6 @@ class ParserInline {
     }
   }
 
-  var State = inline.state_inline.StateInline
+  var State = inline.inline_state.InlineState
 }
 

@@ -15,4 +15,4 @@ import .strikethrough
 import .text
 
 # classes
-import .state_inline
+import .inline_state

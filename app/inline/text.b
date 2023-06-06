@@ -83,7 +83,7 @@ def text(state, silent) {
 # Alternative implementation, for memory.
 #
 # It costs 10% of performance, but allows extend terminators list, if place it
-# to `ParserInline` property. Probably, will switch to it sometime, such
+# to `InlineParser` property. Probably, will switch to it sometime, such
 # flexibility required.
 
 

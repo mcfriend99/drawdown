@@ -8,4 +8,4 @@ import .smartquotes
 import .text_join
 
 # classes
-import .state_core
+import .core_state

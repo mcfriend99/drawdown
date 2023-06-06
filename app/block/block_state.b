@@ -3,8 +3,8 @@
 import ..common.utils { is_space }
 import ..token as _tkn
 
-class StateBlock {
-  StateBlock(src, md, env, tokens) {
+class BlockState {
+  BlockState(src, md, env, tokens) {
     var ch, s, start, pos, len, indent, offset, indent_found
   
     self.src = src

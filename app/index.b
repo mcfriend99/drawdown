@@ -1,9 +1,9 @@
 import .common.utils
 import .helpers
 import .renderer { Renderer }
-import .parser_core { ParserCore }
-import .parser_block { ParserBlock }
-import .parser_inline { ParserInline }
+import .parser_core { BlockCore }
+import .parser_block { BlockParser }
+import .parser_inline { InlineParser }
 import .config as presets
 import url
 import iters
@@ -202,31 +202,31 @@ def normalize_link_text(uri) {
 class Markdown {
 
   /**
-   * Instance of [[ParserInline]]. You may need it to add new rules when
+   * Instance of [[InlineParser]]. You may need it to add new rules when
    * writing plugins. For simple rules control use [[Markdown.disable]] and
    * [[Markdown.enable]].
    * 
-   * @type ParserInline
+   * @type InlineParser
    */
-  var inline = ParserInline()
+  var inline = InlineParser()
 
   /**
-   * Instance of [[ParserBlock]]. You may need it to add new rules when
+   * Instance of [[BlockParser]]. You may need it to add new rules when
    * writing plugins. For simple rules control use [[Markdown.disable]] and
    * [[Markdown.enable]].
    * 
-   * @type ParserBlock
+   * @type BlockParser
    */
-  var block = ParserBlock()
+  var block = BlockParser()
 
   /**
    * Instance of [[Core]] chain executor. You may need it to add new rules when
    * writing plugins. For simple rules control use [[Markdown.disable]] and
    * [[Markdown.enable]].
    * 
-   * @type ParserCore
+   * @type BlockCore
    */
-  var core = ParserCore()
+  var core = BlockCore()
 
   /**
    * Instance of [[Renderer]]. Use it to modify output look. Or to add rendering

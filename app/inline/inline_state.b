@@ -3,7 +3,7 @@
 import ..token as _tkn
 import ..common.utils { is_white_space, is_punct_char, is_md_ascii_punct }
 
-class StateInline {
+class InlineState {
   
   /**
    * Stores { start: end } pairs. Useful for backtrack
@@ -43,7 +43,7 @@ class StateInline {
   /**
    * @constructor
    */
-  StateInline(src, md, env, out_tokens) {
+  InlineState(src, md, env, out_tokens) {
     self.src = src
     self.env = env
     self.md = md

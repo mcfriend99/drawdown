@@ -24,7 +24,7 @@ var _rules = [
  * 
  * @internal
  */
-class ParserBlock {
+class BlockParser {
 
   /**
    * [[Ruler]] instance. Keep configuration of block rules.
@@ -36,7 +36,7 @@ class ParserBlock {
   /**
    * @constructor
    */
-  ParserBlock() {
+  BlockParser() {
     iter var i = 0; i < _rules.length(); i++ {
       self.ruler.push(_rules[i][0], _rules[i][1], { alt: (_rules[i].length() > 2 ? _rules[i][2] : [])[,] })
     }
@@ -123,6 +123,6 @@ class ParserBlock {
     self.tokenize(state, state.line, state.line_max)
   }
 
-  var State = block.state_block.StateBlock
+  var State = block.block_state.BlockState
 }
 

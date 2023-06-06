@@ -20,7 +20,7 @@ var _rules = [
  * 
  * @internal
  */
-class ParserCore {
+class BlockCore {
 
   /**
    * [[Ruler]] instance. Keep configuration of core rules.
@@ -32,7 +32,7 @@ class ParserCore {
   /**
    * @internal
    */
-  ParserCore() {
+  BlockCore() {
     iter var i = 0; i < _rules.length(); i++ {
       self.ruler.push(_rules[i][0], _rules[i][1])
     }
@@ -53,6 +53,6 @@ class ParserCore {
     }
   }
 
-  var State = core.state_core.StateCore
+  var State = core.core_state.CoreState
 }
 

@@ -12,4 +12,4 @@ import .reference
 import .table
 
 # class
-import .state_block
+import .block_state
