@@ -22,7 +22,7 @@ var _rules = [
  * Top-level rules executor. Glues block/inline parsers and does intermediate
  * transformations.
  */
-class ParserCore {
+class Parser_core {
 
   /**
    * Core#ruler
@@ -32,7 +32,7 @@ class ParserCore {
    */
   var ruler = Ruler()
 
-  ParserCore() {
+  Parser_core() {
     iter var i = 0; i < _rules.length(); i++ {
       self.ruler.push(_rules[i][0], _rules[i][1])
     }
@@ -46,13 +46,13 @@ class ParserCore {
   process(state) {
     var i = 0, l, rules
   
-    rules = self.ruler.getRules('')
+    rules = self.ruler.get_rules('')
   
     iter l = rules.length(); i < l; i++ {
       rules[i](state)
     }
   }
 
-  var State = core.state_core.StateCore
+  var State = core.state_core.State_core
 }
 

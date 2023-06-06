@@ -1,19 +1,19 @@
 # Code block (4 spaces padded)
 
-def code(state, startLine, endLine, silent) {
+def code(state, start_line, end_line, silent) {
   var nextLine, last, token
 
-  if state.sCount[startLine] - state.blkIndent < 4 return false
+  if state.s_count[start_line] - state.blk_indent < 4 return false
 
-  last = nextLine = startLine + 1
+  last = nextLine = start_line + 1
 
-  while nextLine < endLine {
-    if state.isEmpty(nextLine) {
+  while nextLine < end_line {
+    if state.is_empty(nextLine) {
       nextLine++
       continue
     }
 
-    if state.sCount[nextLine] - state.blkIndent >= 4 {
+    if state.s_count[nextLine] - state.blk_indent >= 4 {
       nextLine++
       last = nextLine
       continue
@@ -24,8 +24,8 @@ def code(state, startLine, endLine, silent) {
   state.line = last
 
   token         = state.push('code_block', 'code', 0)
-  token.content = state.getLines(startLine, last, 4 + state.blkIndent, false) + '\n'
-  token.map     = [ startLine, state.line ]
+  token.content = state.get_lines(start_line, last, 4 + state.blk_indent, false) + '\n'
+  token.map     = [ start_line, state.line ]
 
   return true
 }

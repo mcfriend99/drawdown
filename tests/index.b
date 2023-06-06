@@ -1,9 +1,7 @@
 import ..app
 import json
 
-var md = app.Markdown({
-  autolink: false,
-})
+var md = app.Markdown('commonmark')
 /* var start = microtime()
 file('test.html', 'w').write(md.render(file('test.md').read()))
 echo 'Completed in ${(microtime() - start) / 1000000}s' */
@@ -16,7 +14,8 @@ describe('Markdown Test', @() {
     }
   })
 }) */
-echo md.render('
+echo md.render('<table><tr><td>\n<pre>\n**Hello**,\n\n_world_.\n</pre>\n</td></tr></table>\n')
+/* echo md.render('
 ### [Footnotes](https://github.com/markdown-it/markdown-it-footnote)
 
 Footnote 1 link[^first].
@@ -57,5 +56,5 @@ Term 1
 Term 2
   ~ Definition 2a
   ~ Definition 2b
-')
+') */
 

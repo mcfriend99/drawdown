@@ -124,11 +124,11 @@ class Token {
   }
 
   /**
-   * Token.attrIndex(name) -> Number
+   * Token.attr_index(name) -> Number
    *
    * Search attribute index by name.
    */
-  attrIndex(name) {
+  attr_index(name) {
     var attrs, i = 0, len
   
     if !self.attrs return -1
@@ -142,41 +142,41 @@ class Token {
   }
 
   /**
-   * Token.attrPush(attrData)
+   * Token.attr_push(attr_data)
    *
    * Add `[ name, value ]` attribute to list. Init attrs if necessary
    */
-  attrPush(attrData) {
+  attr_push(attr_data) {
     if self.attrs {
-      self.attrs.append(attrData)
+      self.attrs.append(attr_data)
     } else {
-      self.attrs = [ attrData ]
+      self.attrs = [ attr_data ]
     }
   }
 
   /**
-   * Token.attrSet(name, value)
+   * Token.attr_set(name, value)
    *
    * Set `name` attribute to `value`. Override old value if exists.
    */
-  attrSet(name, value) {
-    var idx = self.attrIndex(name),
-        attrData = [ name, value ]
+  attr_set(name, value) {
+    var idx = self.attr_index(name),
+        attr_data = [ name, value ]
   
     if idx < 0 {
-      self.attrPush(attrData)
+      self.attr_push(attr_data)
     } else {
-      self.attrs[idx] = attrData
+      self.attrs[idx] = attr_data
     }
   }
 
   /**
-   * Token.attrGet(name)
+   * Token.attr_get(name)
    *
    * Get the value of attribute `name`, or nil if it does not exist.
    */
-  attrGet(name) {
-    var idx = self.attrIndex(name), value = nil
+  attr_get(name) {
+    var idx = self.attr_index(name), value = nil
     if idx >= 0 {
       value = self.attrs[idx][1]
     }
@@ -184,16 +184,16 @@ class Token {
   }
 
   /**
-   * Token.attrJoin(name, value)
+   * Token.attr_join(name, value)
    *
    * Join value to existing attribute via space. Or create new attribute if not
    * exists. Useful to operate with token classes.
    */
-  attrJoin(name, value) {
-    var idx = self.attrIndex(name)
+  attr_join(name, value) {
+    var idx = self.attr_index(name)
   
     if idx < 0 {
-      self.attrPush([ name, value ]);
+      self.attr_push([ name, value ]);
     } else {
       self.attrs[idx][1] = self.attrs[idx][1] + ' ' + value
     }

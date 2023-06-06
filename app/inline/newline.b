@@ -1,6 +1,6 @@
 # Proceess '\n'
 
-import ..common.utils { isSpace }
+import ..common.utils { is_space }
 
 def newline(state, silent) {
   var pmax, max, ws, pos = state.pos
@@ -8,7 +8,7 @@ def newline(state, silent) {
   if state.src[pos] != '\n' return false
 
   pmax = state.pending.length() - 1
-  max = state.posMax
+  max = state.pos_max
 
   # '  \n' -> hardbreak
   # Lookup in pending chars is bad practice! Don't copy to other rules!
@@ -36,7 +36,7 @@ def newline(state, silent) {
   pos++
 
   # skip heading spaces for next line
-  while pos < max and isSpace(state.src[pos]) pos++
+  while pos < max and is_space(state.src[pos]) pos++
 
   state.pos = pos
   return true

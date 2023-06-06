@@ -22,21 +22,21 @@ var _rules = [
 /** 
  * internal
  * 
- * class ParserBlock
+ * class Parser_block
  *
  * Block-level tokenizer.
  */
-class ParserBlock {
+class Parser_block {
 
   /**
-   * ParserBlock#ruler
+   * Parser_block#ruler
    *
    * [[Ruler]] instance. Keep configuration of block rules.
    * @type Ruler
    */
   var ruler = Ruler()
 
-  ParserBlock() {
+  Parser_block() {
     iter var i = 0; i < _rules.length(); i++ {
       self.ruler.push(_rules[i][0], _rules[i][1], { alt: (_rules[i].length() > 2 ? _rules[i][2] : [])[,] })
     }
@@ -45,26 +45,26 @@ class ParserBlock {
   /**
    * Generate tokens for input range
    */
-  tokenize(state, startLine, endLine) {
-    var ok, i, prevLine,
-        rules = self.ruler.getRules(''),
+  tokenize(state, start_line, end_line) {
+    var ok, i, prev_line,
+        rules = self.ruler.get_rules(''),
         len = rules.length(),
-        line = startLine,
-        hasEmptyLines = false,
-        maxNesting = state.md.options.maxNesting
+        line = start_line,
+        has_empty_lines = false,
+        max_nesting = state.md.options.max_nesting
   
-    while line < endLine {
-      state.line = line = state.skipEmptyLines(line)
-      if line >= endLine break
+    while line < end_line {
+      state.line = line = state.skip_empty_lines(line)
+      if line >= end_line break
   
       # Termination condition for nested calls.
       # Nested calls currently used for blockquotes & lists
-      if state.sCount[line] < state.blkIndent  break
+      if state.s_count[line] < state.blk_indent  break
   
       # If nesting level exceeded - skip tail to the end. That's not ordinary
       # situation and we should not care about content.
-      if state.level >= maxNesting {
-        state.line = endLine
+      if state.level >= max_nesting {
+        state.line = end_line
         break
       }
   
@@ -74,13 +74,13 @@ class ParserBlock {
       # - update `state.line`
       # - update `state.tokens`
       # - return true
-      prevLine = state.line
+      prev_line = state.line
   
       iter i = 0; i < len; i++ {
-        ok = rules[i](state, line, endLine, false)
+        ok = rules[i](state, line, end_line, false)
         if ok {
-          if prevLine >= state.line {
-            die Exception("block rule didn't increment state.line")
+          if prev_line >= state.line {
+            die Exception("block rule didn't increment state line")
           }
           break
         }
@@ -91,17 +91,17 @@ class ParserBlock {
   
       # set state.tight if we had an empty line before current tag
       # i.e. latest empty line should not count
-      state.tight = !hasEmptyLines
+      state.tight = !has_empty_lines
   
       # paragraph might "eat" one newline after it in nested lists
-      if state.isEmpty(state.line - 1) {
-        hasEmptyLines = true
+      if state.is_empty(state.line - 1) {
+        has_empty_lines = true
       }
   
       line = state.line
   
-      if line < endLine and state.isEmpty(line) {
-        hasEmptyLines = true
+      if line < end_line and state.is_empty(line) {
+        has_empty_lines = true
         line++
         state.line = line
       }
@@ -109,20 +109,20 @@ class ParserBlock {
   }
 
   /**
-   * ParserBlock.parse(str, md, env, outTokens)
+   * Parser_block.parse(str, md, env, out_tokens)
    *
-   * Process input string and push block tokens into `outTokens`
+   * Process input string and push block tokens into `out_tokens`
    */
-  parse(src, md, env, outTokens) {
+  parse(src, md, env, out_tokens) {
     var state
   
     if !src return
   
-    state = self.State(src, md, env, outTokens)
+    state = self.State(src, md, env, out_tokens)
   
-    self.tokenize(state, state.line, state.lineMax)
+    self.tokenize(state, state.line, state.line_max)
   }
 
-  var State = block.state_block.StateBlock
+  var State = block.state_block.State_block
 }
 

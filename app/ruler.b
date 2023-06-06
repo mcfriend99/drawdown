@@ -50,9 +50,9 @@ class Ruler {
     iters.each(self.__rules__, @(rule) {
       if !rule.enabled return
   
-      iters.each(rule.alt, @(altName) {
-        if chains.index_of(altName) < 0 {
-          chains.append(altName)
+      iters.each(rule.alt, @(alt_name) {
+        if chains.index_of(alt_name) < 0 {
+          chains.append(alt_name)
         }
       })
     })
@@ -109,13 +109,13 @@ class Ruler {
   }
 
   /**
-   * Ruler.before(beforeName, ruleName, fn [, options])
+   * Ruler.before(before_name, rule_name, fn [, options])
    *
    * Add new rule to chain before one with given name. See also
    * [[Ruler.after]], [[Ruler.push]].
    * 
-   * @param {string} beforeName: new rule will be added before this one.
-   * @param {string} ruleName: name of added rule.
+   * @param {string} before_name: new rule will be added before this one.
+   * @param {string} rule_name: name of added rule.
    * @param {function} fn: rule function.
    * @param {dict} options: rule options (optional).
    *
@@ -133,15 +133,15 @@ class Ruler {
    * })
    * ```
    */
-  before(beforeName, ruleName, fn, options) {
-    var index = self.__find__(beforeName)
+  before(before_name, rule_name, fn, options) {
+    var index = self.__find__(before_name)
     var opt = options or {}
   
-    if index == -1 die Exception('Parser rule not found: ' + beforeName)
+    if index == -1 die Exception('Parser rule not found: ' + before_name)
   
     self.__rules__.remove_at(index)
     self.__rules__.insert(index, {
-      name: ruleName,
+      name: rule_name,
       enabled: true,
       fn: fn,
       alt: opt.alt or []
@@ -151,13 +151,13 @@ class Ruler {
   }
 
   /**
-   * Ruler.after(afterName, ruleName, fn [, options])
+   * Ruler.after(after_name, rule_name, fn [, options])
    *
    * Add new rule to chain after one with given name. See also
    * [[Ruler.before]], [[Ruler.push]].
    * 
-   * @param {string} afterName: new rule will be added after this one.
-   * @param {string} ruleName: name of added rule.
+   * @param {string} after_name: new rule will be added after this one.
+   * @param {string} rule_name: name of added rule.
    * @param {function} fn: rule function.
    * @param {dict} options: rule options (optional).
    *
@@ -175,15 +175,15 @@ class Ruler {
    * })
    * ```
    */
-  after(afterName, ruleName, fn, options) {
-    var index = self.__find__(afterName)
+  after(after_name, rule_name, fn, options) {
+    var index = self.__find__(after_name)
     var opt = options or {}
   
-    if index == -1 die Exception('Parser rule not found: ' + afterName)
+    if index == -1 die Exception('Parser rule not found: ' + after_name)
   
     self.__rules__.remove_at(index + 1)
     self.__rules__.insert(index + 1, {
-      name: ruleName,
+      name: rule_name,
       enabled: true,
       fn: fn,
       alt: opt.alt or []
@@ -193,12 +193,12 @@ class Ruler {
   }
 
   /**
-   * Ruler.push(ruleName, fn [, options])
+   * Ruler.push(rule_name, fn [, options])
    *
    * Push new rule to the end of chain. See also
    * [[Ruler.before]], [[Ruler.after]].
    * 
-   * @param {string} ruleName: name of added rule.
+   * @param {string} rule_name: name of added rule.
    * @param {function} fn: rule function.
    * @param {dict} options: rule options (optional).
    *
@@ -216,33 +216,33 @@ class Ruler {
    * })
    * ```
    */
-  push(ruleName, fn, options) {
+  push(rule_name, fn, options) {
     var opt = options or {}
   
     self.__rules__.append({
-      name: ruleName,
+      name: rule_name,
       enabled: true,
       fn: fn,
-      alt: opt.get('alt') or []
+      alt: opt.get('alt', [])
     })
   
     self.__cache__ = nil
   }
 
   /**
-   * Ruler.enable(list [, ignoreInvalid]) -> list
+   * Ruler.enable(list [, ignore_invalid]) -> list
    *
    * Enable rules with given names. If any rule name not found - dies Exception.
    * Errors can be disabled by second param.
    *
    * Returns list of found rule names (if no exception happened).
    *
-   * See also [[Ruler.disable]], [[Ruler.enableOnly]].
+   * See also [[Ruler.disable]], [[Ruler.enable_only]].
    * 
    * @param {string|list} list: list of rule names to enable.
-   * @param {bool} ignoreInvalid: set `true` to ignore errors when rule not found.
+   * @param {bool} ignore_invalid: set `true` to ignore errors when rule not found.
    */
-  enable(list, ignoreInvalid) {
+  enable(list, ignore_invalid) {
     if !is_list(list) list = [ list ]
   
     var result = []
@@ -252,7 +252,7 @@ class Ruler {
       var idx = self.__find__(name)
   
       if idx < 0 {
-        if ignoreInvalid return
+        if ignore_invalid return
         die Exception('Rules manager: invalid rule name ' + name);
       }
       self.__rules__[idx].enabled = true
@@ -264,7 +264,7 @@ class Ruler {
   }
 
   /**
-   * Ruler.enableOnly(list [, ignoreInvalid])
+   * Ruler.enable_only(list [, ignore_invalid])
    *
    * Enable rules with given names, and disable everything else. If any rule name
    * not found - throw Error. Errors can be disabled by second param.
@@ -272,29 +272,29 @@ class Ruler {
    * See also [[Ruler.disable]], [[Ruler.enable]].
    * 
    * @param {string|list} list: list of rule names to enable (whitelist).
-   * @param {bool} ignoreInvalid: set `true` to ignore errors when rule not found.
+   * @param {bool} ignore_invalid: set `true` to ignore errors when rule not found.
    */
-  enableOnly(list, ignoreInvalid) {
+  enable_only(list, ignore_invalid) {
     if !is_list(list) list = [ list ]
   
     iters.each(self.__rules__, @(rule) { rule.enabled = false })
-    self.enable(list, ignoreInvalid)
+    self.enable(list, ignore_invalid)
   }
 
   /**
-   * Ruler.disable(list [, ignoreInvalid]) -> list
+   * Ruler.disable(list [, ignore_invalid]) -> list
    *
    * Disable rules with given names. If any rule name not found - throw Error.
    * Errors can be disabled by second param.
    *
    * Returns list of found rule names (if no exception happened).
    *
-   * See also [[Ruler.enable]], [[Ruler.enableOnly]].
+   * See also [[Ruler.enable]], [[Ruler.enable_only]].
    * 
    * @param {string|list} list: list of rule names to disable.
-   * @param {bool} ignoreInvalid: set `true` to ignore errors when rule not found.
+   * @param {bool} ignore_invalid: set `true` to ignore errors when rule not found.
    */
-  disable(list, ignoreInvalid) {
+  disable(list, ignore_invalid) {
     if !is_list(list) list = [ list ]
   
     var result = []
@@ -304,7 +304,7 @@ class Ruler {
       var idx = self.__find__(name)
   
       if idx < 0 {
-        if ignoreInvalid return
+        if ignore_invalid return
         die Exception('Rules manager: invalid rule name ' + name)
       }
       self.__rules__[idx].enabled = false
@@ -316,7 +316,7 @@ class Ruler {
   }
 
   /**
-   * Ruler.getRules(chainName) -> list
+   * Ruler.get_rules(chain_name) -> list
    *
    * Return list of active functions (rules) for given chain name. It analyzes
    * rules configuration, compiles caches if not exists and returns result.
@@ -324,13 +324,13 @@ class Ruler {
    * Default chain name is `''` (empty string). It can't be skipped. That's
    * done intentionally, to keep signature monomorphic for high speed.
    **/
-  getRules(chainName) {
+  get_rules(chain_name) {
     if self.__cache__ == nil {
       self.__compile__()
     }
   
     # Chain can be empty, if rules disabled. But we still have to return list.
-    return self.__cache__.get(chainName, [])
+    return self.__cache__.get(chain_name, [])
   }
 }
 

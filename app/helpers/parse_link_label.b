@@ -3,11 +3,11 @@
 # this function assumes that first character ("[") already matches;
 # returns the end of the label
 
-def parseLinkLabel(state, start, disableNested) {
-  var level, found, marker, prevPos,
-      labelEnd = -1,
-      max = state.posMax,
-      oldPos = state.pos
+def parse_link_label(state, start, disable_nested) {
+  var level, found, marker, prev_pos,
+      label_end = -1,
+      max = state.pos_max,
+      old_pos = state.pos
 
   state.pos = start + 1
   level = 1
@@ -22,26 +22,26 @@ def parseLinkLabel(state, start, disableNested) {
       }
     }
 
-    prevPos = state.pos
-    state.md.inline.skipToken(state)
+    prev_pos = state.pos
+    state.md.inline.skip_token(state)
     if marker == '[' {
-      if prevPos == state.pos - 1 {
+      if prev_pos == state.pos - 1 {
         # increase level if we find text `[`, which is not a part of any token
         level++
-      } else if disableNested {
-        state.pos = oldPos
+      } else if disable_nested {
+        state.pos = old_pos
         return -1
       }
     }
   }
 
   if found {
-    labelEnd = state.pos
+    label_end = state.pos
   }
 
   # restore old state
-  state.pos = oldPos
+  state.pos = old_pos
 
-  return labelEnd
+  return label_end
 }
 

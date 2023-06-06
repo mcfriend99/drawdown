@@ -9,7 +9,7 @@
 
 # !!!! Don't confuse with "Markdown ASCII Punctuation" chars
 # http:#spec.commonmark.org/0.15/#ascii-punctuation-character
-/* def _isTerminatorChar(ch) {
+/* def _is_terminator_char(ch) {
   if is_string(ch) ch = ord(ch)
   using ch {
     when  0x0A, # \n
@@ -40,7 +40,7 @@
   }
 } */
 
-var _terminatorChars = [
+var _terminator_chars = [
   "\n",
   "!",
   "#",
@@ -63,12 +63,12 @@ var _terminatorChars = [
   "`",
   "{",
   "}",
-  "~",
+  "~"
 ]
 
 def text(state, silent) {
   var pos = state.pos
-  while pos < state.posMax and !_terminatorChars.contains(state.src[pos]) {
+  while pos < state.pos_max and !_terminator_chars.contains(state.src[pos]) {
     pos++
   }
   if pos == state.pos return false
@@ -83,7 +83,7 @@ def text(state, silent) {
 # Alternative implementation, for memory.
 #
 # It costs 10% of performance, but allows extend terminators list, if place it
-# to `ParserInline` property. Probably, will switch to it sometime, such
+# to `Parser_inline` property. Probably, will switch to it sometime, such
 # flexibility required.
 
 

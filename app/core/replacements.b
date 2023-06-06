@@ -17,11 +17,11 @@ var SCOPED_ABBR = {
   tm: '™'
 }
 
-def _replace_scoped(inlineTokens) {
+def _replace_scoped(inline_tokens) {
   var i, token, inside_autolink = 0
 
-  iter i = inlineTokens.length() - 1; i >= 0; i-- {
-    token = inlineTokens[i]
+  iter i = inline_tokens.length() - 1; i >= 0; i-- {
+    token = inline_tokens[i]
 
     if token.type == 'text' and !inside_autolink {
       var matches = token.content.matches(SCOPED_ABBR_RE)
@@ -42,11 +42,11 @@ def _replace_scoped(inlineTokens) {
   }
 }
 
-def _replace_rare(inlineTokens) {
+def _replace_rare(inline_tokens) {
   var i, token, inside_autolink = 0
 
-  iter i = inlineTokens.length() - 1; i >= 0; i-- {
-    token = inlineTokens[i]
+  iter i = inline_tokens.length() - 1; i >= 0; i-- {
+    token = inline_tokens[i]
 
     if token.type == 'text' and !inside_autolink {
       if token.content.match(RARE_RE) {
@@ -75,20 +75,20 @@ def _replace_rare(inlineTokens) {
 }
 
 def replacements(state) {
-  var blkIdx
+  var blk_idx
 
   if !state.md.options.typographer return
 
-  iter blkIdx = state.tokens.length() - 1; blkIdx >= 0; blkIdx-- {
+  iter blk_idx = state.tokens.length() - 1; blk_idx >= 0; blk_idx-- {
 
-    if (state.tokens[blkIdx].type != 'inline') { continue; }
+    if (state.tokens[blk_idx].type != 'inline') { continue; }
 
-    if state.tokens[blkIdx].content.match(SCOPED_ABBR_RE) {
-      _replace_scoped(state.tokens[blkIdx].children)
+    if state.tokens[blk_idx].content.match(SCOPED_ABBR_RE) {
+      _replace_scoped(state.tokens[blk_idx].children)
     }
 
-    if state.tokens[blkIdx].content.match(RARE_RE) {
-      _replace_rare(state.tokens[blkIdx].children)
+    if state.tokens[blk_idx].content.match(RARE_RE) {
+      _replace_rare(state.tokens[blk_idx].children)
     }
   }
 }

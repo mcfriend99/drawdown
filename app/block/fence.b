@@ -1,13 +1,13 @@
 # fences (``` lang, ~~~ lang)
 
-def fence(state, startLine, endLine, silent) {
+def fence(state, start_line, end_line, silent) {
   var marker, len, params, nextLine, mem, token, markup,
-      haveEndMarker = false,
-      pos = state.bMarks[startLine] + state.tShift[startLine],
-      max = state.eMarks[startLine]
+      have_end_marker = false,
+      pos = state.b_marks[start_line] + state.t_shift[start_line],
+      max = state.e_marks[start_line]
 
   # if it's indented more than 3 spaces, it should be a code block
-  if state.sCount[startLine] - state.blkIndent >= 4 return false
+  if state.s_count[start_line] - state.blk_indent >= 4 return false
 
   if pos + 3 > max return false
 
@@ -19,7 +19,7 @@ def fence(state, startLine, endLine, silent) {
 
   # scan marker length
   mem = pos
-  pos = state.skipChars(pos, marker)
+  pos = state.skip_chars(pos, marker)
 
   len = pos - mem
 
@@ -38,20 +38,20 @@ def fence(state, startLine, endLine, silent) {
   if silent return true
 
   # search end of block
-  nextLine = startLine;
+  nextLine = start_line;
 
   iter ;; {
     nextLine++
-    if nextLine >= endLine {
+    if nextLine >= end_line {
       # unclosed block should be autoclosed by end of document.
       # also block seems to be autoclosed by end of parent
       break
     }
 
-    pos = mem = state.bMarks[nextLine] + state.tShift[nextLine]
-    max = state.eMarks[nextLine]
+    pos = mem = state.b_marks[nextLine] + state.t_shift[nextLine]
+    max = state.e_marks[nextLine]
 
-    if pos < max and state.sCount[nextLine] < state.blkIndent {
+    if pos < max and state.s_count[nextLine] < state.blk_indent {
       # non-empty line with negative indent should stop the list:
       # - ```
       #  test
@@ -60,36 +60,36 @@ def fence(state, startLine, endLine, silent) {
 
     if state.src[pos] != marker continue
 
-    if state.sCount[nextLine] - state.blkIndent >= 4 {
+    if state.s_count[nextLine] - state.blk_indent >= 4 {
       # closing fence should be indented less than 4 spaces
       continue
     }
 
-    pos = state.skipChars(pos, marker)
+    pos = state.skip_chars(pos, marker)
 
     # closing code fence must be at least as long as the opening one
     if pos - mem < len continue
 
     # make sure tail has spaces only
-    pos = state.skipSpaces(pos)
+    pos = state.skip_spaces(pos)
 
     if pos < max continue
 
-    haveEndMarker = true
+    have_end_marker = true
     # found!
     break
   }
 
   # If a fence has heading spaces, they should be removed from its inner block
-  len = state.sCount[startLine]
+  len = state.s_count[start_line]
 
-  state.line = nextLine + (haveEndMarker ? 1 : 0)
+  state.line = nextLine + (have_end_marker ? 1 : 0)
 
   token         = state.push('fence', 'code', 0)
   token.info    = params
-  token.content = state.getLines(startLine + 1, nextLine, len, true)
+  token.content = state.get_lines(start_line + 1, nextLine, len, true)
   token.markup  = markup
-  token.map     = [ startLine, state.line ]
+  token.map     = [ start_line, state.line ]
 
   return true
 }

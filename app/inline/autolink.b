@@ -5,13 +5,13 @@ var AUTOLINK_RE = '/^([a-zA-Z][a-zA-Z0-9+.\-]{1,31}):([^<>\\x00-\\x20]*)$/'
 
 
 def autolink(state, silent) {
-  var url, fullUrl, token, ch, start, max,
+  var url, full_url, token, ch, start, max,
       pos = state.pos
 
   if state.src[pos] != '<' return false
 
   start = state.pos
-  max = state.posMax
+  max = state.pos_max
 
   iter ;; {
     if pos++ >= max return false
@@ -25,17 +25,17 @@ def autolink(state, silent) {
   url = state.src[start + 1, pos]
 
   if url.match(AUTOLINK_RE) {
-    fullUrl = state.md.normalizeLink(url)
-    if !state.md.validateLink(fullUrl) return false
+    full_url = state.md.normalize_link(url)
+    if !state.md.validate_link(full_url) return false
 
     if !silent {
       token         = state.push('link_open', 'a', 1)
-      token.attrs   = [ [ 'href', fullUrl ] ]
+      token.attrs   = [ [ 'href', full_url ] ]
       token.markup  = 'autolink'
       token.info    = 'auto'
 
       token         = state.push('text', '', 0)
-      token.content = state.md.normalizeLinkText(url)
+      token.content = state.md.normalize_link_text(url)
 
       token         = state.push('link_close', 'a', -1)
       token.markup  = 'autolink'
@@ -47,17 +47,17 @@ def autolink(state, silent) {
   }
 
   if url.match(EMAIL_RE) {
-    fullUrl = state.md.normalizeLink('mailto:' + url)
-    if !state.md.validateLink(fullUrl) return false
+    full_url = state.md.normalize_link('mailto:' + url)
+    if !state.md.validate_link(full_url) return false
 
     if !silent {
       token         = state.push('link_open', 'a', 1)
-      token.attrs   = [ [ 'href', fullUrl ] ]
+      token.attrs   = [ [ 'href', full_url ] ]
       token.markup  = 'autolink'
       token.info    = 'auto'
 
       token         = state.push('text', '', 0)
-      token.content = state.md.normalizeLinkText(url)
+      token.content = state.md.normalize_link_text(url)
 
       token         = state.push('link_close', 'a', -1)
       token.markup  = 'autolink'

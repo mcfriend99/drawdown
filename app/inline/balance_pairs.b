@@ -1,31 +1,31 @@
 # For each opening emphasis-like marker find a matching closing one
 
-def _processDelimiters(delimiters) {
-  var closerIdx, openerIdx, closer, opener, minOpenerIdx, newMinOpenerIdx,
-      isOddMatch, lastJump,
-      openersBottom = {},
+def _process_delimiters(delimiters) {
+  var closer_idx, opener_idx, closer, opener, min_opener_idx, new_min_opener_idx,
+      is_odd_match, last_jump,
+      openers_bottom = {},
       max = delimiters.length()
 
   if !max return
 
-  # headerIdx is the first delimiter of the current (where closer is) delimiter run
-  var headerIdx = 0
-  var lastTokenIdx = -2 # needs any value lower than -1
+  # header_idx is the first delimiter of the current (where closer is) delimiter run
+  var header_idx = 0
+  var last_token_idx = -2 # needs any value lower than -1
   var jumps = []
 
-  iter closerIdx = 0; closerIdx < max; closerIdx++ {
-    closer = delimiters[closerIdx]
+  iter closer_idx = 0; closer_idx < max; closer_idx++ {
+    closer = delimiters[closer_idx]
 
     jumps.append(0)
 
     # markers belong to same delimiter run if:
     #  - they have adjacent tokens
     #  - AND markers are the same
-    if delimiters[headerIdx].marker != closer.marker or lastTokenIdx != closer.token - 1 {
-      headerIdx = closerIdx
+    if delimiters[header_idx].marker != closer.marker or last_token_idx != closer.token - 1 {
+      header_idx = closer_idx
     }
 
-    lastTokenIdx = closer.token
+    last_token_idx = closer.token
 
     # Length is only used for emphasis-specific "rule of 3",
     # if it's not defined (in strikethrough or 3rd party plugins),
@@ -38,24 +38,24 @@ def _processDelimiters(delimiters) {
     # for each marker, each delimiter length modulo 3,
     # and for whether this closer can be an opener;
     # https://github.com/commonmark/cmark/commit/34250e12ccebdc6372b8b49c44fab57c72443460
-    if !openersBottom.contains(closer.marker) {
-      openersBottom[closer.marker] = [ -1, -1, -1, -1, -1, -1 ]
+    if !openers_bottom.contains(closer.marker) {
+      openers_bottom[closer.marker] = [ -1, -1, -1, -1, -1, -1 ]
     }
 
-    minOpenerIdx = openersBottom[closer.marker][(closer.open ? 3 : 0) + (closer.length % 3)]
+    min_opener_idx = openers_bottom[closer.marker][(closer.open ? 3 : 0) + (closer.length % 3)]
 
-    openerIdx = headerIdx - jumps[headerIdx] - 1
+    opener_idx = header_idx - jumps[header_idx] - 1
 
-    newMinOpenerIdx = openerIdx
+    new_min_opener_idx = opener_idx
 
-    iter ; openerIdx > minOpenerIdx; openerIdx -= jumps[openerIdx] + 1 {
-      opener = delimiters[openerIdx]
+    iter ; opener_idx > min_opener_idx; opener_idx -= jumps[opener_idx] + 1 {
+      opener = delimiters[opener_idx]
 
       if opener.marker != closer.marker continue
 
       if opener.open and opener.end < 0 {
 
-        isOddMatch = false
+        is_odd_match = false
 
         # from spec:
         #
@@ -66,42 +66,42 @@ def _processDelimiters(delimiters) {
         if opener.close or closer.open {
           if (opener.length + closer.length) % 3 == 0 {
             if opener.length % 3 != 0 or closer.length % 3 != 0 {
-              isOddMatch = true
+              is_odd_match = true
             }
           }
         }
 
-        if !isOddMatch {
+        if !is_odd_match {
           # If previous delimiter cannot be an opener, we can safely skip
           # the entire sequence in future checks. This is required to make
           # sure algorithm has linear complexity (see *_*_*_*_*_... case).
-          lastJump = openerIdx > 0 and !delimiters[openerIdx - 1].open ?
-            jumps[openerIdx - 1] + 1 :
+          last_jump = opener_idx > 0 and !delimiters[opener_idx - 1].open ?
+            jumps[opener_idx - 1] + 1 :
             0
 
-          jumps[closerIdx] = closerIdx - openerIdx + lastJump
-          jumps[openerIdx] = lastJump
+          jumps[closer_idx] = closer_idx - opener_idx + last_jump
+          jumps[opener_idx] = last_jump
 
           closer.open  = false
-          opener.end   = closerIdx
+          opener.end   = closer_idx
           opener.close = false
-          newMinOpenerIdx = -1
+          new_min_opener_idx = -1
           # treat next token as start of run,
           # it optimizes skips in **<...>**a**<...>** pathological case
-          lastTokenIdx = -2
+          last_token_idx = -2
           break
         }
       }
     }
 
-    if newMinOpenerIdx != -1 {
+    if new_min_opener_idx != -1 {
       # If match for this delimiter run failed, we want to set lower bound for
       # future lookups. This is required to make sure algorithm has linear
       # complexity.
       #
       # See details here:
       # https://github.com/commonmark/cmark/issues/178#issuecomment-270417442
-      openersBottom[closer.marker][(closer.open ? 3 : 0) + ((closer.length or 0) % 3)] = newMinOpenerIdx
+      openers_bottom[closer.marker][(closer.open ? 3 : 0) + ((closer.length or 0) % 3)] = new_min_opener_idx
     }
   }
 }
@@ -111,11 +111,11 @@ def balance_pairs(state) {
       tokens_meta = state.tokens_meta,
       max = state.tokens_meta.length()
 
-  _processDelimiters(state.delimiters)
+  _process_delimiters(state.delimiters)
 
   iter curr = 0; curr < max; curr++ {
     if tokens_meta[curr] and tokens_meta[curr].delimiters {
-      _processDelimiters(tokens_meta[curr].delimiters)
+      _process_delimiters(tokens_meta[curr].delimiters)
     }
   }
 }

@@ -1,34 +1,34 @@
 # Block quotes
 
-import ..common.utils { isSpace }
+import ..common.utils { is_space }
 
-def blockquote(state, startLine, endLine, silent) {
-  var adjustTab,
+def blockquote(state, start_line, end_line, silent) {
+  var adjust_tab,
       ch,
       i,
       initial,
       l,
-      lastLineEmpty,
+      last_line_empty,
       lines,
       nextLine,
       offset,
-      oldBMarks,
-      oldBSCount,
-      oldIndent,
-      oldParentType,
-      oldSCount,
-      oldTShift,
-      spaceAfterMarker,
+      old_bMarks,
+      old_bSCount,
+      old_indent,
+      old_parent_type,
+      old_sCount,
+      old_tShift,
+      space_after_marker,
       terminate,
-      terminatorRules,
+      terminator_rules,
       token,
-      isOutdented,
-      oldLineMax = state.lineMax,
-      pos = state.bMarks[startLine] + state.tShift[startLine],
-      max = state.eMarks[startLine]
+      is_outdented,
+      old_line_max = state.line_max,
+      pos = state.b_marks[start_line] + state.t_shift[start_line],
+      max = state.e_marks[start_line]
 
   # if it's indented more than 3 spaces, it should be a code block
-  if state.sCount[startLine] - state.blkIndent >= 4 return false
+  if state.s_count[start_line] - state.blk_indent >= 4 return false
 
   # check the block quote marker
   if state.src[pos] != '>' return false
@@ -37,15 +37,15 @@ def blockquote(state, startLine, endLine, silent) {
   # so no point trying to find the end of it in silent mode
   if silent return true
 
-  oldBMarks  = []
-  oldBSCount = []
-  oldSCount  = []
-  oldTShift  = []
+  old_bMarks  = []
+  old_bSCount = []
+  old_sCount  = []
+  old_tShift  = []
 
-  terminatorRules = state.md.block.ruler.getRules('blockquote')
+  terminator_rules = state.md.block.ruler.get_rules('blockquote')
 
-  oldParentType = state.parentType
-  state.parentType = 'blockquote'
+  old_parent_type = state.parent_type
+  state.parent_type = 'blockquote'
 
   # Search the end of the block
   #
@@ -65,7 +65,7 @@ def blockquote(state, startLine, endLine, silent) {
   #     > test
   #      - - -
   #     ```
-  iter nextLine = startLine; nextLine < endLine; nextLine++ {
+  iter nextLine = start_line; nextLine < end_line; nextLine++ {
     # check if it's outdented, i.e. it's inside list item and indented
     # less than said list item:
     #
@@ -74,21 +74,21 @@ def blockquote(state, startLine, endLine, silent) {
     #    > current blockquote
     # 2. checking this line
     # ```
-    isOutdented = state.sCount[nextLine] < state.blkIndent
+    is_outdented = state.s_count[nextLine] < state.blk_indent
 
-    pos = state.bMarks[nextLine] + state.tShift[nextLine]
-    max = state.eMarks[nextLine]
+    pos = state.b_marks[nextLine] + state.t_shift[nextLine]
+    max = state.e_marks[nextLine]
 
     if pos >= max {
       # Case 1: line is not inside the blockquote, and this line is empty.
       break
     }
 
-    if state.src[pos++ - 1] == '>' and !isOutdented {
+    if state.src[pos++ - 1] == '>' and !is_outdented {
       # This line is inside the blockquote.
 
       # set offset past spaces and ">"
-      initial = state.sCount[nextLine] + 1
+      initial = state.s_count[nextLine] + 1
 
       # skip one optional space after '>'
       if state.src[pos] == ' ' {
@@ -96,37 +96,37 @@ def blockquote(state, startLine, endLine, silent) {
         #     ^ -- position start of line here:
         pos++
         initial++
-        adjustTab = false
-        spaceAfterMarker = true
+        adjust_tab = false
+        space_after_marker = true
       } else if state.src[pos] == '\t' {
-        spaceAfterMarker = true
+        space_after_marker = true
 
-        if (state.bsCount[nextLine] + initial) % 4 == 3 {
+        if (state.bs_count[nextLine] + initial) % 4 == 3 {
           # '  >\t  test '
           #       ^ -- position start of line here (tab has width==1)
           pos++
           initial++
-          adjustTab = false
+          adjust_tab = false
         } else {
           # ' >\t  test '
-          #    ^ -- position start of line here + shift bsCount slightly
+          #    ^ -- position start of line here + shift bs_count slightly
           #         to make extra space appear
-          adjustTab = true
+          adjust_tab = true
         }
       } else {
-        spaceAfterMarker = false
+        space_after_marker = false
       }
 
       offset = initial
-      oldBMarks.append(state.bMarks[nextLine])
-      state.bMarks[nextLine] = pos
+      old_bMarks.append(state.b_marks[nextLine])
+      state.b_marks[nextLine] = pos
 
       while pos < max {
         ch = state.src[pos]
 
-        if isSpace(ch) {
+        if is_space(ch) {
           if ch == '\t' {
-            offset += 4 - (offset + state.bsCount[nextLine] + (adjustTab ? 1 : 0)) % 4
+            offset += 4 - (offset + state.bs_count[nextLine] + (adjust_tab ? 1 : 0)) % 4
           } else {
             offset++
           }
@@ -137,27 +137,27 @@ def blockquote(state, startLine, endLine, silent) {
         pos++
       }
 
-      lastLineEmpty = pos >= max
+      last_line_empty = pos >= max
 
-      oldBSCount.append(state.bsCount[nextLine])
-      state.bsCount[nextLine] = state.sCount[nextLine] + 1 + (spaceAfterMarker ? 1 : 0)
+      old_bSCount.append(state.bs_count[nextLine])
+      state.bs_count[nextLine] = state.s_count[nextLine] + 1 + (space_after_marker ? 1 : 0)
 
-      oldSCount.append(state.sCount[nextLine])
-      state.sCount[nextLine] = offset - initial
+      old_sCount.append(state.s_count[nextLine])
+      state.s_count[nextLine] = offset - initial
 
-      oldTShift.append(state.tShift[nextLine])
-      state.tShift[nextLine] = pos - state.bMarks[nextLine]
+      old_tShift.append(state.t_shift[nextLine])
+      state.t_shift[nextLine] = pos - state.b_marks[nextLine]
       continue
     }
 
     # Case 2: line is not inside the blockquote, and the last line was empty.
-    if lastLineEmpty break
+    if last_line_empty break
 
     # Case 3: another tag found.
     terminate = false
     i = 0
-    iter l = terminatorRules.length(); i < l; i++ {
-      if terminatorRules[i](state, nextLine, endLine, true) {
+    iter l = terminator_rules.length(); i < l; i++ {
+      if terminator_rules[i](state, nextLine, end_line, true) {
         terminate = true
         break
       }
@@ -165,60 +165,60 @@ def blockquote(state, startLine, endLine, silent) {
 
     if terminate {
       # Quirk to enforce "hard termination mode" for paragraphs;
-      # normally if you call `tokenize(state, startLine, nextLine)`,
+      # normally if you call `tokenize(state, start_line, nextLine)`,
       # paragraphs will look below nextLine for paragraph continuation,
       # but if blockquote is terminated by another tag, they shouldn't
-      state.lineMax = nextLine
+      state.line_max = nextLine
 
-      if state.blkIndent != 0 {
-        # state.blkIndent was non-zero, we now set it to zero,
+      if state.blk_indent != 0 {
+        # state.blk_indent was non-zero, we now set it to zero,
         # so we need to re-calculate all offsets to appear as
         # if indent wasn't changed
-        oldBMarks.append(state.bMarks[nextLine])
-        oldBSCount.append(state.bsCount[nextLine])
-        oldTShift.append(state.tShift[nextLine])
-        oldSCount.append(state.sCount[nextLine])
-        state.sCount[nextLine] -= state.blkIndent
+        old_bMarks.append(state.b_marks[nextLine])
+        old_bSCount.append(state.bs_count[nextLine])
+        old_tShift.append(state.t_shift[nextLine])
+        old_sCount.append(state.s_count[nextLine])
+        state.s_count[nextLine] -= state.blk_indent
       }
 
       break
     }
 
-    oldBMarks.append(state.bMarks[nextLine])
-    oldBSCount.append(state.bsCount[nextLine])
-    oldTShift.append(state.tShift[nextLine])
-    oldSCount.append(state.sCount[nextLine])
+    old_bMarks.append(state.b_marks[nextLine])
+    old_bSCount.append(state.bs_count[nextLine])
+    old_tShift.append(state.t_shift[nextLine])
+    old_sCount.append(state.s_count[nextLine])
 
     # A negative indentation means that this is a paragraph continuation
     #
-    state.sCount[nextLine] = -1
+    state.s_count[nextLine] = -1
   }
 
-  oldIndent = state.blkIndent
-  state.blkIndent = 0
+  old_indent = state.blk_indent
+  state.blk_indent = 0
 
   token        = state.push('blockquote_open', 'blockquote', 1)
   token.markup = '>'
-  token.map    = lines = [ startLine, 0 ]
+  token.map    = lines = [ start_line, 0 ]
 
-  state.md.block.tokenize(state, startLine, nextLine)
+  state.md.block.tokenize(state, start_line, nextLine)
 
   token        = state.push('blockquote_close', 'blockquote', -1)
   token.markup = '>'
 
-  state.lineMax = oldLineMax
-  state.parentType = oldParentType
+  state.line_max = old_line_max
+  state.parent_type = old_parent_type
   lines[1] = state.line
 
-  # Restore original tShift; this might not be necessary since the parser
+  # Restore original t_shift; this might not be necessary since the parser
   # has already been here, but just to make sure we can do that.
-  iter i = 0; i < oldTShift.length(); i++ {
-    state.bMarks[i + startLine] = oldBMarks[i]
-    state.tShift[i + startLine] = oldTShift[i]
-    state.sCount[i + startLine] = oldSCount[i]
-    state.bsCount[i + startLine] = oldBSCount[i]
+  iter i = 0; i < old_tShift.length(); i++ {
+    state.b_marks[i + start_line] = old_bMarks[i]
+    state.t_shift[i + start_line] = old_tShift[i]
+    state.s_count[i + start_line] = old_sCount[i]
+    state.bs_count[i + start_line] = old_bSCount[i]
   }
-  state.blkIndent = oldIndent
+  state.blk_indent = old_indent
 
   return true
 }

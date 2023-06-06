@@ -2,12 +2,12 @@
 
 import ..token as _tkn
 
-class StateCore {
-  StateCore(src, md, env) {
+class State_core {
+  State_core(src, md, env) {
     self.src = src
     self.env = env
     self.tokens = []
-    self.inlineMode = false
+    self.inline_mode = false
     self.md = md; # link to parser instance
   }
 

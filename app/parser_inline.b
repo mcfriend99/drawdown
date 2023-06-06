@@ -24,8 +24,8 @@ var _rules = [
 # Don't use this for anything except pairs (plugins working with `balance_pairs`).
 var _rules2 = [
   [ 'balance_pairs',   inline.balance_pairs ],
-  [ 'strikethrough',   inline.strikethrough.postProcess ],
-  [ 'emphasis',        inline.emphasis.postProcess ],
+  [ 'strikethrough',   inline.strikethrough.post_process ],
+  [ 'emphasis',        inline.emphasis.post_process ],
   # rules for pairs separate '**' into its own text tokens, which may be left unused,
   # rule below merges unused segments back with the rest of the text
   [ 'fragments_join',  inline.fragments_join ]
@@ -35,14 +35,14 @@ var _rules2 = [
 /** 
  * internal
  * 
- * class ParserInline
+ * class Parser_inline
  *
  * Tokenizes paragraph content.
  */
-class ParserInline {
+class Parser_inline {
 
   /**
-   * ParserInline#ruler
+   * Parser_inline#ruler
    *
    * [[Ruler]] instance. Keep configuration of core rules.
    * @type Ruler
@@ -50,7 +50,7 @@ class ParserInline {
   var ruler = Ruler()
 
   /**
-   * ParserInline#ruler2
+   * Parser_inline#ruler2
    * 
    *[[Ruler]] instance. Second ruler used for post-processing
    * (e.g. in emphasis-like rules).
@@ -58,7 +58,7 @@ class ParserInline {
    */
   var ruler2 = Ruler()
 
-  ParserInline() {
+  Parser_inline() {
     iter var i = 0; i < _rules.length(); i++ {
       self.ruler.push(_rules[i][0], _rules[i][1])
     }
@@ -71,11 +71,11 @@ class ParserInline {
   /**
    * Skip single token by running all rules in validation mode
    */
-  skipToken(state) {
+  skip_token(state) {
     var ok, i, pos = state.pos,
-        rules = self.ruler.getRules(''),
+        rules = self.ruler.get_rules(''),
         len = rules.length(),
-        maxNesting = state.md.options.maxNesting,
+        max_nesting = state.md.options.max_nesting,
         cache = state.cache
 
     if cache.contains(pos) {
@@ -83,7 +83,7 @@ class ParserInline {
       return
     }
   
-    if state.level < maxNesting {
+    if state.level < max_nesting {
       iter i = 0; i < len; i++ {
         # Increment state.level and decrement it later to limit recursion.
         # It's harmless to do here, because no tokens are created. But ideally,
@@ -93,7 +93,7 @@ class ParserInline {
         state.level--
   
         if ok {
-          if pos >= state.pos die Exception("inline rule didn't increment state position")
+          # if pos >= state.pos die Exception("inline rule didn't increment state position")
           break
         }
       }
@@ -101,14 +101,14 @@ class ParserInline {
       # Too much nesting, just skip until the end of the paragraph.
       #
       # NOTE: this will cause links to behave incorrectly in the following case,
-      #       when an amount of `[` is exactly equal to `maxNesting + 1`:
+      #       when an amount of `[` is exactly equal to `max_nesting + 1`:
       #
       #       [[[[[[[[[[[[[[[[[[[[[foo]()
       #
       # TODO: remove this workaround when CM standard will allow nested links
       #       (we can replace it by preventing links from being parsed in
       #       validation mode)
-      state.pos = state.posMax
+      state.pos = state.pos_max
     }
     
     if !ok state.pos++
@@ -120,10 +120,10 @@ class ParserInline {
    */
   tokenize(state) {
     var ok, i,
-        rules = self.ruler.getRules(''),
+        rules = self.ruler.get_rules(''),
         len = rules.length(),
-        end = state.posMax,
-        maxNesting = state.md.options.maxNesting
+        end = state.pos_max,
+        max_nesting = state.md.options.max_nesting
   
     while state.pos < end {
       # Try all possible rules.
@@ -133,17 +133,18 @@ class ParserInline {
       # - update `state.tokens`
       # - return true
   
-      var prevPos = state.pos
-      if state.level < maxNesting {
+      # var prev_pos = state.pos
+      if state.level < max_nesting {
         iter i = 0; i < len; i++ {
           ok = rules[i](state, false)
           if ok {
-            if prevPos >= state.pos die Exception("inline rule didn't increment state.pos")
+            # if prev_pos >= state.pos 
+            #   die Exception("inline rule didn't increment state.pos")
             break
           }
         }
       }
-
+      
       if ok {
         if state.pos >= end break
         continue
@@ -153,22 +154,22 @@ class ParserInline {
     }
   
     if state.pending {
-      state.pushPending()
+      state.push_pending()
     }
   }
 
   /**
-   * ParserInline.parse(str, md, env, outTokens)
+   * Parser_inline.parse(str, md, env, out_tokens)
    *
-   * Process input string and push inline tokens into `outTokens`
+   * Process input string and push inline tokens into `out_tokens`
    */
-  parse(str, md, env, outTokens) {
+  parse(str, md, env, out_tokens) {
     var i, rules, len
-    var state = self.State(str, md, env, outTokens)
+    var state = self.State(str, md, env, out_tokens)
   
     self.tokenize(state)
   
-    rules = self.ruler2.getRules('')
+    rules = self.ruler2.get_rules('')
     len = rules.length()
   
     iter i = 0; i < len; i++ {
@@ -176,6 +177,6 @@ class ParserInline {
     }
   }
 
-  var State = inline.state_inline.StateInline
+  var State = inline.state_inline.State_inline
 }
 

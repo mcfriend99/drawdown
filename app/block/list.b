@@ -1,12 +1,12 @@
 # Lists
 
-import ..common.utils { isSpace }
+import ..common.utils { is_space }
 
-def _skipBulletListMarker(state, startLine) {
+def _skip_bullet_list_marker(state, start_line) {
   var marker, pos, max, ch
 
-  pos = state.bMarks[startLine] + state.tShift[startLine]
-  max = state.eMarks[startLine]
+  pos = state.b_marks[start_line] + state.t_shift[start_line]
+  max = state.e_marks[start_line]
 
   marker = state.src[pos++ - 1]
   # Check bullet
@@ -17,7 +17,7 @@ def _skipBulletListMarker(state, startLine) {
   if pos < max {
     ch = state.src[pos]
 
-    if !isSpace(ch) {
+    if !is_space(ch) {
       # " -test " - is not a list item
       return -1
     }
@@ -26,11 +26,11 @@ def _skipBulletListMarker(state, startLine) {
   return pos
 }
 
-def _skipOrderedListMarker(state, startLine) {
+def _skip_ordered_list_marker(state, start_line) {
   var ch,
-      start = state.bMarks[startLine] + state.tShift[startLine],
+      start = state.b_marks[start_line] + state.t_shift[start_line],
       pos = start,
-      max = state.eMarks[startLine]
+      max = state.e_marks[start_line]
 
   # List marker should have at least 2 chars (digit + dot)
   if pos + 1 >= max return -1
@@ -66,7 +66,7 @@ def _skipOrderedListMarker(state, startLine) {
   if pos < max {
     ch = state.src[pos]
 
-    if !isSpace(ch) {
+    if !is_space(ch) {
       # " 1.test " - is not a list item
       return -1
     }
@@ -74,7 +74,7 @@ def _skipOrderedListMarker(state, startLine) {
   return pos
 }
 
-def _markTightParagraphs(state, idx) {
+def _mark_tight_paragraphs(state, idx) {
   var i, l,
       level = state.level + 2
 
@@ -88,40 +88,40 @@ def _markTightParagraphs(state, idx) {
   }
 }
 
-def list(state, startLine, endLine, silent) {
+def list(state, start_line, end_line, silent) {
   var ch,
-      contentStart,
+      content_start,
       i,
       indent,
-      indentAfterMarker,
+      indent_after_marker,
       initial,
-      isOrdered,
-      itemLines,
+      is_ordered,
+      item_lines,
       l,
-      listLines,
-      listTokIdx,
-      markerCharCode,
-      markerValue,
+      list_lines,
+      list_tok_idx,
+      marker_char_code,
+      marker_value,
       max,
       offset,
-      oldListIndent,
-      oldParentType,
-      oldSCount,
-      oldTShift,
-      oldTight,
+      old_list_indent,
+      old_parent_type,
+      old_sCount,
+      old_tShift,
+      old_tight,
       pos,
-      posAfterMarker,
-      prevEmptyEnd,
+      pos_after_marker,
+      prev_empty_end,
       start,
       terminate,
-      terminatorRules,
+      terminator_rules,
       token,
-      nextLine = startLine,
-      isTerminatingParagraph = false,
+      nextLine = start_line,
+      is_terminating_paragraph = false,
       tight = true
 
   # if it's indented more than 3 spaces, it should be a code block
-  if state.sCount[nextLine] - state.blkIndent >= 4 return false
+  if state.s_count[nextLine] - state.blk_indent >= 4 return false
 
   # Special case:
   #  - item 1
@@ -129,37 +129,37 @@ def list(state, startLine, endLine, silent) {
   #    - item 3
   #     - item 4
   #      - this one is a paragraph continuation
-  if state.listIndent >= 0 and
-      state.sCount[nextLine] - state.listIndent >= 4 and
-      state.sCount[nextLine] < state.blkIndent {
+  if state.list_indent >= 0 and
+      state.s_count[nextLine] - state.list_indent >= 4 and
+      state.s_count[nextLine] < state.blk_indent {
     return false
   }
 
   # limit conditions when list can interrupt
   # a paragraph (validation mode only)
-  if silent and state.parentType == 'paragraph' {
+  if silent and state.parent_type == 'paragraph' {
     # Next list item should still terminate previous list item;
     #
-    # This code can fail if plugins use blkIndent as well as lists,
+    # This code can fail if plugins use blk_indent as well as lists,
     # but I hope the spec gets fixed long before that happens.
     #
-    if state.sCount[nextLine] >= state.blkIndent {
-      isTerminatingParagraph = true
+    if state.s_count[nextLine] >= state.blk_indent {
+      is_terminating_paragraph = true
     }
   }
 
   # Detect list type and position after marker
-  if (posAfterMarker = _skipOrderedListMarker(state, nextLine)) >= 0 {
-    isOrdered = true
-    start = state.bMarks[nextLine] + state.tShift[nextLine]
-    markerValue = to_number(state.src[start, posAfterMarker - 1])
+  if (pos_after_marker = _skip_ordered_list_marker(state, nextLine)) >= 0 {
+    is_ordered = true
+    start = state.b_marks[nextLine] + state.t_shift[nextLine]
+    marker_value = to_number(state.src[start, pos_after_marker - 1])
 
     # If we're starting a new ordered list right after
     # a paragraph, it should start with 1.
-    if isTerminatingParagraph and markerValue != 1 return false
+    if is_terminating_paragraph and marker_value != 1 return false
 
-  } else if (posAfterMarker = _skipBulletListMarker(state, nextLine)) >= 0 {
-    isOrdered = false
+  } else if (pos_after_marker = _skip_bullet_list_marker(state, nextLine)) >= 0 {
+    is_ordered = false
 
   } else {
     return false
@@ -167,53 +167,53 @@ def list(state, startLine, endLine, silent) {
 
   # If we're starting a new unordered list right after
   # a paragraph, first line should not be empty.
-  if isTerminatingParagraph {
-    if state.skipSpaces(posAfterMarker) >= state.eMarks[nextLine] return false
+  if is_terminating_paragraph {
+    if state.skip_spaces(pos_after_marker) >= state.e_marks[nextLine] return false
   }
 
   # For validation mode we can terminate immediately
   if silent return true
 
   # We should terminate list on style change. Remember first one to compare.
-  markerCharCode = state.src[posAfterMarker - 1]
+  marker_char_code = state.src[pos_after_marker - 1]
 
   # Start list
-  listTokIdx = state.tokens.length()
+  list_tok_idx = state.tokens.length()
 
-  if isOrdered {
+  if is_ordered {
     token       = state.push('ordered_list_open', 'ol', 1)
-    if markerValue != 1 {
-      token.attrs = [ [ 'start', markerValue ] ]
+    if marker_value != 1 {
+      token.attrs = [ [ 'start', marker_value ] ]
     }
 
   } else {
     token       = state.push('bullet_list_open', 'ul', 1)
   }
 
-  token.map    = listLines = [ nextLine, 0 ]
-  token.markup = markerCharCode
+  token.map    = list_lines = [ nextLine, 0 ]
+  token.markup = marker_char_code
 
   #
   # Iterate list items
   #
 
-  prevEmptyEnd = false
-  terminatorRules = state.md.block.ruler.getRules('list')
+  prev_empty_end = false
+  terminator_rules = state.md.block.ruler.get_rules('list')
 
-  oldParentType = state.parentType
-  state.parentType = 'list'
+  old_parent_type = state.parent_type
+  state.parent_type = 'list'
 
-  while nextLine < endLine {
-    pos = posAfterMarker
-    max = state.eMarks[nextLine]
+  while nextLine < end_line {
+    pos = pos_after_marker
+    max = state.e_marks[nextLine]
 
-    initial = offset = state.sCount[nextLine] + posAfterMarker - (state.bMarks[nextLine] + state.tShift[nextLine])
+    initial = offset = state.s_count[nextLine] + pos_after_marker - (state.b_marks[nextLine] + state.t_shift[nextLine])
 
     while pos < max {
       ch = state.src[pos]
 
       if ch == '\t' {
-        offset += 4 - (offset + state.bsCount[nextLine]) % 4
+        offset += 4 - (offset + state.bs_count[nextLine]) % 4
       } else if ch == ' ' {
         offset++
       } else {
@@ -223,49 +223,49 @@ def list(state, startLine, endLine, silent) {
       pos++
     }
 
-    contentStart = pos
+    content_start = pos
 
-    if contentStart >= max {
+    if content_start >= max {
       # trimming space in "-    \n  3" case, indent is 1 here
-      indentAfterMarker = 1
+      indent_after_marker = 1
     } else {
-      indentAfterMarker = offset - initial
+      indent_after_marker = offset - initial
     }
 
     # If we have more than 4 spaces, the indent is 1
     # (the rest is just indented code block)
-    if indentAfterMarker > 4 indentAfterMarker = 1
+    if indent_after_marker > 4 indent_after_marker = 1
 
     # "  -  test"
     #  ^^^^^ - calculating total length of this thing
-    indent = initial + indentAfterMarker
+    indent = initial + indent_after_marker
 
     # Run subparser & write tokens
     token        = state.push('list_item_open', 'li', 1)
-    token.markup = markerCharCode
-    token.map    = itemLines = [ nextLine, 0 ]
-    if isOrdered {
-      token.info = state.src[start, posAfterMarker - 1]
+    token.markup = marker_char_code
+    token.map    = item_lines = [ nextLine, 0 ]
+    if is_ordered {
+      token.info = state.src[start, pos_after_marker - 1]
     }
 
     # change current state, then restore it after parser subcall
-    oldTight = state.tight
-    oldTShift = state.tShift[nextLine]
-    oldSCount = state.sCount[nextLine]
+    old_tight = state.tight
+    old_tShift = state.t_shift[nextLine]
+    old_sCount = state.s_count[nextLine]
 
     #  - example list
-    # ^ listIndent position will be here
-    #   ^ blkIndent position will be here
+    # ^ list_indent position will be here
+    #   ^ blk_indent position will be here
     #
-    oldListIndent = state.listIndent
-    state.listIndent = state.blkIndent
-    state.blkIndent = indent
+    old_list_indent = state.list_indent
+    state.list_indent = state.blk_indent
+    state.blk_indent = indent
 
     state.tight = true
-    state.tShift[nextLine] = contentStart - state.bMarks[nextLine]
-    state.sCount[nextLine] = offset
+    state.t_shift[nextLine] = content_start - state.b_marks[nextLine]
+    state.s_count[nextLine] = offset
 
-    if contentStart >= max and state.isEmpty(nextLine + 1) {
+    if content_start >= max and state.is_empty(nextLine + 1) {
       # workaround for this case
       # (list item is empty, list terminates before "foo"):
       # ~~~~~~~~
@@ -273,46 +273,46 @@ def list(state, startLine, endLine, silent) {
       #
       #     foo
       # ~~~~~~~~
-      state.line = min(state.line + 2, endLine)
+      state.line = min(state.line + 2, end_line)
     } else {
-      state.md.block.tokenize(state, nextLine, endLine)
+      state.md.block.tokenize(state, nextLine, end_line)
     }
 
     # If any of list item is tight, mark list as tight
-    if !state.tight or prevEmptyEnd {
+    if !state.tight or prev_empty_end {
       tight = false
     }
     # Item become loose if finish with empty line,
     # but we should filter last element, because it means list finish
-    prevEmptyEnd = (state.line - nextLine) > 1 and state.isEmpty(state.line - 1)
+    prev_empty_end = (state.line - nextLine) > 1 and state.is_empty(state.line - 1)
 
-    state.blkIndent = state.listIndent
-    state.listIndent = oldListIndent
-    state.tShift[nextLine] = oldTShift
-    state.sCount[nextLine] = oldSCount
-    state.tight = oldTight
+    state.blk_indent = state.list_indent
+    state.list_indent = old_list_indent
+    state.t_shift[nextLine] = old_tShift
+    state.s_count[nextLine] = old_sCount
+    state.tight = old_tight
 
     token        = state.push('list_item_close', 'li', -1)
-    token.markup = markerCharCode
+    token.markup = marker_char_code
 
     nextLine = state.line
-    itemLines[1] = nextLine
+    item_lines[1] = nextLine
 
-    if nextLine >= endLine break
+    if nextLine >= end_line break
 
     #
     # Try to check if list is terminated or continued.
     #
-    if state.sCount[nextLine] < state.blkIndent break
+    if state.s_count[nextLine] < state.blk_indent break
 
     # if it's indented more than 3 spaces, it should be a code block
-    if state.sCount[nextLine] - state.blkIndent >= 4 break
+    if state.s_count[nextLine] - state.blk_indent >= 4 break
 
     # fail if terminating block found
     terminate = false
     i = 0
-    iter l = terminatorRules.length(); i < l; i++ {
-      if terminatorRules[i](state, nextLine, endLine, true) {
+    iter l = terminator_rules.length(); i < l; i++ {
+      if terminator_rules[i](state, nextLine, end_line, true) {
         terminate = true
         break
       }
@@ -320,34 +320,34 @@ def list(state, startLine, endLine, silent) {
     if terminate break
 
     # fail if list has another type
-    if (isOrdered) {
-      posAfterMarker = _skipOrderedListMarker(state, nextLine);
-      if (posAfterMarker < 0) { break; }
-      start = state.bMarks[nextLine] + state.tShift[nextLine];
+    if (is_ordered) {
+      pos_after_marker = _skip_ordered_list_marker(state, nextLine);
+      if (pos_after_marker < 0) { break; }
+      start = state.b_marks[nextLine] + state.t_shift[nextLine];
     } else {
-      posAfterMarker = _skipBulletListMarker(state, nextLine);
-      if (posAfterMarker < 0) { break; }
+      pos_after_marker = _skip_bullet_list_marker(state, nextLine);
+      if (pos_after_marker < 0) { break; }
     }
 
-    if markerCharCode != state.src[posAfterMarker - 1] break
+    if marker_char_code != state.src[pos_after_marker - 1] break
   }
 
   # Finalize list
-  if isOrdered {
+  if is_ordered {
     token = state.push('ordered_list_close', 'ol', -1)
   } else {
     token = state.push('bullet_list_close', 'ul', -1)
   }
-  token.markup = markerCharCode
+  token.markup = marker_char_code
 
-  listLines[1] = nextLine
+  list_lines[1] = nextLine
   state.line = nextLine
 
-  state.parentType = oldParentType
+  state.parent_type = old_parent_type
 
   # mark paragraphs tight if needed
   if (tight) {
-    _markTightParagraphs(state, listTokIdx)
+    _mark_tight_paragraphs(state, list_tok_idx)
   }
 
   return true

@@ -10,7 +10,7 @@ def tokenize(state, silent) {
 
   if marker != '~' return false
 
-  scanned = state.scanDelims(state.pos, true)
+  scanned = state.scan_delims(state.pos, true)
   len = scanned.length
   ch = marker
 
@@ -41,45 +41,45 @@ def tokenize(state, silent) {
   return true
 }
 
-def _postProcess(state, delimiters) {
+def _post_process(state, delimiters) {
   var i, j,
-      startDelim,
-      endDelim,
+      start_delim,
+      end_delim,
       token,
-      loneMarkers = [],
+      lone_markers = [],
       max = delimiters.length()
       
   iter i = 0; i < max; i++ {
-    startDelim = delimiters[i]
+    start_delim = delimiters[i]
 
-    if startDelim.marker != '~' {
+    if start_delim.marker != '~' {
       continue
     }
 
-    if startDelim.end == -1 {
+    if start_delim.end == -1 {
       continue
     }
 
-    endDelim = delimiters[startDelim.end]
+    end_delim = delimiters[start_delim.end]
 
-    token         = state.tokens[startDelim.token]
+    token         = state.tokens[start_delim.token]
     token.type    = 's_open'
     token.tag     = 's'
     token.nesting = 1
     token.markup  = '~~'
     token.content = ''
 
-    token         = state.tokens[endDelim.token]
+    token         = state.tokens[end_delim.token]
     token.type    = 's_close'
     token.tag     = 's'
     token.nesting = -1
     token.markup  = '~~'
     token.content = ''
 
-    if state.tokens[endDelim.token - 1].type == 'text' and
-        state.tokens[endDelim.token - 1].content == '~' {
+    if state.tokens[end_delim.token - 1].type == 'text' and
+        state.tokens[end_delim.token - 1].content == '~' {
 
-      loneMarkers.append(endDelim.token - 1)
+      lone_markers.append(end_delim.token - 1)
     }
   }
 
@@ -89,8 +89,8 @@ def _postProcess(state, delimiters) {
   #
   # So, we have to move all those markers after subsequent s_close tags.
   #
-  while loneMarkers.length() > 0 {
-    i = loneMarkers.pop()
+  while lone_markers.length() > 0 {
+    i = lone_markers.pop()
     j = i + 1
 
     while j < state.tokens.length() and state.tokens[j].type == 's_close' {
@@ -109,16 +109,16 @@ def _postProcess(state, delimiters) {
 
 
 # Walk through delimiter list and replace text tokens with tags
-def postProcess(state) {
+def post_process(state) {
   var curr,
       tokens_meta = state.tokens_meta,
       max = state.tokens_meta.length()
 
-  _postProcess(state, state.delimiters)
+  _post_process(state, state.delimiters)
 
   iter curr = 0; curr < max; curr++ {
     if tokens_meta[curr] and tokens_meta[curr].delimiters {
-      _postProcess(state, tokens_meta[curr].delimiters)
+      _post_process(state, tokens_meta[curr].delimiters)
     }
   }
 }

@@ -1,14 +1,14 @@
 # Horizontal rule
 
-import ..common.utils { isSpace }
+import ..common.utils { is_space }
 
-def hr(state, startLine, endLine, silent) {
+def hr(state, start_line, end_line, silent) {
   var marker, cnt, ch, token,
-      pos = state.bMarks[startLine] + state.tShift[startLine],
-      max = state.eMarks[startLine]
+      pos = state.b_marks[start_line] + state.t_shift[start_line],
+      max = state.e_marks[start_line]
 
   # if it's indented more than 3 spaces, it should be a code block
-  if state.sCount[startLine] - state.blkIndent >= 4 return false
+  if state.s_count[start_line] - state.blk_indent >= 4 return false
 
   marker = state.src[pos++ - 1]
 
@@ -22,7 +22,7 @@ def hr(state, startLine, endLine, silent) {
   cnt = 1
   while pos < max {
     ch = state.src[pos++ - 1]
-    if ch != marker and !isSpace(ch) return false
+    if ch != marker and !is_space(ch) return false
     if ch == marker cnt++
   }
 
@@ -30,10 +30,10 @@ def hr(state, startLine, endLine, silent) {
 
   if silent return true
 
-  state.line = startLine + 1
+  state.line = start_line + 1
 
   token        = state.push('hr', 'hr', 0)
-  token.map    = [ startLine, state.line ]
+  token.map    = [ start_line, state.line ]
   token.markup = marker * (cnt + 1)
 
   return true

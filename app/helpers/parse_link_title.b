@@ -1,8 +1,8 @@
 # Parse link title
 
-import ..common.utils { unescapeAll }
+import ..common.utils { unescape_all }
 
-def parseLinkTitle(str, start, max) {
+def parse_link_title(str, start, max) {
   var code,
       marker,
       lines = 0,
@@ -30,7 +30,7 @@ def parseLinkTitle(str, start, max) {
     if code == marker {
       result.pos = pos + 1
       result.lines = lines
-      result.str = unescapeAll(str[start + 1, pos])
+      result.str = unescape_all(str[start + 1, pos])
       result.ok = true
       return result
     } else if code == '(' and marker == ')' {

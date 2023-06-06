@@ -1,9 +1,9 @@
 var commonmark = {
   options: {
     html:         true,         # Enable HTML tags in source
-    xhtmlOut:     true,         # Use '/' to close single tags (<br />)
+    xhtml_out:     true,         # Use '/' to close single tags (<br />)
     breaks:       false,        # Convert '\n' in paragraphs into <br>
-    langPrefix:   'language-',  # CSS language prefix for fenced blocks
+    lang_prefix:   'language-',  # CSS language prefix for fenced blocks
     linkify:      false,        # autoconvert URL-like texts to links
 
     # Enable some language-neutral replacements + quotes beautification
@@ -24,7 +24,7 @@ var commonmark = {
     #
     highlight: nil,
 
-    maxNesting:   20            # Internal protection, recursion limit
+    max_nesting:   20            # Internal protection, recursion limit
   },
 
   components: {
@@ -78,9 +78,9 @@ var commonmark = {
 var standard = {
   options: {
     html:         false,        # Enable HTML tags in source
-    xhtmlOut:     false,        # Use '/' to close single tags (<br />)
+    xhtml_out:     false,        # Use '/' to close single tags (<br />)
     breaks:       false,        # Convert '\n' in paragraphs into <br>
-    langPrefix:   'language-',  # CSS language prefix for fenced blocks
+    lang_prefix:   'language-',  # CSS language prefix for fenced blocks
     linkify:      false,        # autoconvert URL-like texts to links
 
     # Enable some language-neutral replacements + quotes beautification
@@ -101,7 +101,7 @@ var standard = {
     #
     highlight: nil,
 
-    maxNesting:   100            # Internal protection, recursion limit
+    max_nesting:   100            # Internal protection, recursion limit
   },
 
   components: {
@@ -115,9 +115,9 @@ var standard = {
 var zero = {
   options: {
     html:         false,        # Enable HTML tags in source
-    xhtmlOut:     false,        # Use '/' to close single tags (<br />)
+    xhtml_out:     false,        # Use '/' to close single tags (<br />)
     breaks:       false,        # Convert '\n' in paragraphs into <br>
-    langPrefix:   'language-',  # CSS language prefix for fenced blocks
+    lang_prefix:   'language-',  # CSS language prefix for fenced blocks
     linkify:      false,        # autoconvert URL-like texts to links
 
     # Enable some language-neutral replacements + quotes beautification
@@ -138,7 +138,7 @@ var zero = {
     #
     highlight: nil,
 
-    maxNesting:   20            # Internal protection, recursion limit
+    max_nesting:   20            # Internal protection, recursion limit
   },
 
   components: {

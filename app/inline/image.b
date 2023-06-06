@@ -1,14 +1,14 @@
 # Process ![image](<src> "title")
 
-import ..common.utils { normalizeReference, isSpace }
+import ..common.utils { normalize_reference, is_space }
 
 def image(state, silent) {
   var attrs,
       code,
       content,
       label,
-      labelEnd,
-      labelStart,
+      label_end,
+      label_start,
       pos,
       ref,
       res,
@@ -17,19 +17,19 @@ def image(state, silent) {
       tokens,
       start,
       href = '',
-      oldPos = state.pos,
-      max = state.posMax
+      old_pos = state.pos,
+      max = state.pos_max
 
   if state.src[state.pos] != '!' return false
   if state.pos + 1 >= state.src.length() or state.src[state.pos + 1] != '[' return false
 
-  labelStart = state.pos + 2
-  labelEnd = state.md.helpers.parseLinkLabel(state, state.pos + 1, false)
+  label_start = state.pos + 2
+  label_end = state.md.helpers.parse_link_label(state, state.pos + 1, false)
 
   # parser failed to find ']', so it's not a valid link
-  if labelEnd < 0 return false
+  if label_end < 0 return false
 
-  pos = labelEnd + 1
+  pos = label_end + 1
   if pos < max and state.src[pos] == '(' {
     #
     # Inline link
@@ -40,17 +40,17 @@ def image(state, silent) {
     pos++
     iter ; pos < max; pos++ {
       code = state.src[pos]
-      if !isSpace(code) and code != '\n' break
+      if !is_space(code) and code != '\n' break
     }
     if pos >= max return false
 
     # [link](  <href>  "title"  )
     #          ^^^^^^ parsing link destination
     start = pos
-    res = state.md.helpers.parseLinkDestination(state.src, pos, state.posMax)
+    res = state.md.helpers.parse_link_destination(state.src, pos, state.pos_max)
     if res.ok {
-      href = state.md.normalizeLink(res.str)
-      if state.md.validateLink(href) {
+      href = state.md.normalize_link(res.str)
+      if state.md.validate_link(href) {
         pos = res.pos
       } else {
         href = ''
@@ -62,12 +62,12 @@ def image(state, silent) {
     start = pos
     iter ; pos < max; pos++ {
       code = state.src[pos]
-      if !isSpace(code) and code != '\n' break
+      if !is_space(code) and code != '\n' break
     }
 
     # [link](  <href>  "title"  )
     #                  ^^^^^^^ parsing link title
-    res = state.md.helpers.parseLinkTitle(state.src, pos, state.posMax)
+    res = state.md.helpers.parse_link_title(state.src, pos, state.pos_max)
     if pos < max and start != pos and res.ok {
       title = res.str
       pos = res.pos
@@ -76,14 +76,14 @@ def image(state, silent) {
       #                         ^^ skipping these spaces
       iter ; pos < max; pos++ {
         code = state.src[pos]
-        if !isSpace(code) and code != '\n' break
+        if !is_space(code) and code != '\n' break
       }
     } else {
       title = ''
     }
 
     if pos >= max or state.src[pos] != ')' {
-      state.pos = oldPos
+      state.pos = old_pos
       return false
     }
     pos++
@@ -95,23 +95,23 @@ def image(state, silent) {
 
     if pos < max and state.src[pos] == '[' {
       start = pos + 1
-      pos = state.md.helpers.parseLinkLabel(state, pos)
+      pos = state.md.helpers.parse_link_label(state, pos)
       if pos >= 0 {
         label = state.src[start, pos++ - 1]
       } else {
-        pos = labelEnd + 1
+        pos = label_end + 1
       }
     } else {
-      pos = labelEnd + 1
+      pos = label_end + 1
     }
 
     # covers label == '' and label == undefined
     # (collapsed reference link and shortcut reference link respectively)
-    if !label label = state.src[labelStart, labelEnd]
+    if !label label = state.src[label_start, label_end]
 
-    ref = state.env.references.get(normalizeReference(label), nil)
+    ref = state.env.references.get(normalize_reference(label), nil)
     if !ref {
-      state.pos = oldPos
+      state.pos = old_pos
       return false
     }
     href = ref.href
@@ -123,7 +123,7 @@ def image(state, silent) {
   # so all that's left to do is to call tokenizer.
   #
   if !silent {
-    content = state.src[labelStart, labelEnd]
+    content = state.src[label_start, label_end]
 
     state.md.inline.parse(
       content,
@@ -143,6 +143,6 @@ def image(state, silent) {
   }
 
   state.pos = pos
-  state.posMax = max
+  state.pos_max = max
   return true
 }

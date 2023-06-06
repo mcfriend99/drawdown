@@ -1,7 +1,7 @@
 def block(state) {
   var token
 
-  if state.inlineMode {
+  if state.inline_mode {
     token          = state.Token('inline', '', 0)
     token.content  = state.src
     token.map      = [ 0, 1 ]

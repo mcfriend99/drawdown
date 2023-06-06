@@ -1,28 +1,28 @@
 # Convert straight quotation marks to typographic ones
 
-import ..common.utils { isWhiteSpace, isPunctChar, isMdAsciiPunct }
+import ..common.utils { is_white_space, is_punct_char, is_md_ascii_punct }
 
 var QUOTE_RE = '/[\'"]/'
 var APOSTROPHE = '\u2019' /* ’ */
 
-def _replaceAt(str, index, ch) {
+def _replace_at(str, index, ch) {
   return str[,index] + ch + str[index + 1,]
 }
 
 def _process_inlines(tokens, state) {
-  var i, token, text, t, pos, max, thisLevel, item, lastChar, nextChar,
-      isLastPunctChar, isNextPunctChar, isLastWhiteSpace, isNextWhiteSpace,
-      canOpen, canClose, j, isSingle, stack, openQuote, closeQuote;
+  var i, token, text, t, pos, max, this_level, item, last_char, nextChar,
+      is_last_punct_char, is_nextPunct_char, is_last_white_space, is_nextWhite_space,
+      can_open, can_close, j, is_single, stack, open_quote, close_quote;
 
   stack = []
 
   iter i = 0; i < tokens.length(); i++ {
     token = tokens[i]
 
-    thisLevel = tokens[i].level
+    this_level = tokens[i].level
 
     iter j = stack.length() - 1; j >= 0; j-- {
-      if stack[j].level <= thisLevel break
+      if stack[j].level <= this_level break
     }
     while stack.length() > j + 1 stack.pop()
     # stack.length = j + 1
@@ -40,22 +40,22 @@ def _process_inlines(tokens, state) {
       var t_index = text.index_of(t[0], pos)
       t = t[0]
 
-      canOpen = canClose = true
+      can_open = can_close = true
       pos = t_index + 1
-      isSingle = t[0] == "'"
+      is_single = t[0] == "'"
 
       # Find previous character,
       # default to space if it's the beginning of the line
-      lastChar = ' '
+      last_char = ' '
 
       if t_index - 1 >= 0 {
-        lastChar = text[t_index - 1]
+        last_char = text[t_index - 1]
       } else {
         iter j = i - 1; j >= 0; j-- {
-          if tokens[j].type == 'softbreak' or tokens[j].type == 'hardbreak' break # lastChar defaults to 0x20
+          if tokens[j].type == 'softbreak' or tokens[j].type == 'hardbreak' break # last_char defaults to 0x20
           if !tokens[j].content continue # should skip all tokens except 'text', 'html_inline' or 'code_inline'
 
-          lastChar = tokens[j].content[tokens[j].content.length() - 1]
+          last_char = tokens[j].content[tokens[j].content.length() - 1]
           break
         }
       }
@@ -76,80 +76,80 @@ def _process_inlines(tokens, state) {
         }
       }
 
-      isLastPunctChar = isMdAsciiPunct(lastChar) or isPunctChar(lastChar)
-      isNextPunctChar = isMdAsciiPunct(nextChar) or isPunctChar(nextChar)
+      is_last_punct_char = is_md_ascii_punct(last_char) or is_punct_char(last_char)
+      is_nextPunct_char = is_md_ascii_punct(nextChar) or is_punct_char(nextChar)
 
-      isLastWhiteSpace = isWhiteSpace(lastChar)
-      isNextWhiteSpace = isWhiteSpace(nextChar)
+      is_last_white_space = is_white_space(last_char)
+      is_nextWhite_space = is_white_space(nextChar)
 
-      if isNextWhiteSpace {
-        canOpen = false
-      } else if isNextPunctChar {
-        if !(isLastWhiteSpace or isLastPunctChar) {
-          canOpen = false
+      if is_nextWhite_space {
+        can_open = false
+      } else if is_nextPunct_char {
+        if !(is_last_white_space or is_last_punct_char) {
+          can_open = false
         }
       }
 
-      if isLastWhiteSpace {
-        canClose = false
-      } else if isLastPunctChar {
-        if !(isNextWhiteSpace or isNextPunctChar) {
-          canClose = false
+      if is_last_white_space {
+        can_close = false
+      } else if is_last_punct_char {
+        if !(is_nextWhite_space or is_nextPunct_char) {
+          can_close = false
         }
       }
 
       if nextChar == '"' and t[0] == '"' {
-        if ord(lastChar) >= 0x30 /* 0 */ and ord(lastChar) <= 0x39 /* 9 */ {
+        if ord(last_char) >= 0x30 /* 0 */ and ord(last_char) <= 0x39 /* 9 */ {
           # special case: 1"" - count first quote as an inch
-          canClose = canOpen = false
+          can_close = can_open = false
         }
       }
 
-      if canOpen and canClose {
+      if can_open and can_close {
         # Replace quotes in the middle of punctuation sequence, but not
         # in the middle of the words, i.e.:
         #
         # 1. foo " bar " baz - not replaced
         # 2. foo-"-bar-"-baz - replaced
         # 3. foo"bar"baz     - not replaced
-        canOpen = isLastPunctChar
-        canClose = isNextPunctChar
+        can_open = is_last_punct_char
+        can_close = is_nextPunct_char
       }
 
-      if !canOpen and !canClose {
+      if !can_open and !can_close {
         # middle of word
-        if isSingle {
-          token.content = _replaceAt(token.content, t_index, APOSTROPHE)
+        if is_single {
+          token.content = _replace_at(token.content, t_index, APOSTROPHE)
         }
         continue
       }
 
-      if canClose {
+      if can_close {
         # this could be a closing quote, rewind the stack to get a match
         var continue_outer = false
         iter j = stack.length() - 1; j >= 0; j-- {
           item = stack[j]
-          if stack[j].level < thisLevel break
-          if item.single == isSingle and stack[j].level == thisLevel {
+          if stack[j].level < this_level break
+          if item.single == is_single and stack[j].level == this_level {
             item = stack[j]
 
-            if isSingle {
-              openQuote = state.md.options.quotes[2]
-              closeQuote = state.md.options.quotes[3]
+            if is_single {
+              open_quote = state.md.options.quotes[2]
+              close_quote = state.md.options.quotes[3]
             } else {
-              openQuote = state.md.options.quotes[0]
-              closeQuote = state.md.options.quotes[1]
+              open_quote = state.md.options.quotes[0]
+              close_quote = state.md.options.quotes[1]
             }
 
             # replace token.content *before* tokens[item.token].content,
-            # because, if they are pointing at the same token, replaceAt
+            # because, if they are pointing at the same token, replace_at
             # could mess up indices when quote length != 1
-            token.content = _replaceAt(token.content, t_index, closeQuote)
-            tokens[item.token].content = _replaceAt(
-              tokens[item.token].content, item.pos, openQuote)
+            token.content = _replace_at(token.content, t_index, close_quote)
+            tokens[item.token].content = _replace_at(
+              tokens[item.token].content, item.pos, open_quote)
 
-            pos += closeQuote.length() - 1
-            if item.token == i pos += openQuote.length() - 1
+            pos += close_quote.length() - 1
+            if item.token == i pos += open_quote.length() - 1
 
             text = token.content
             max = text.length()
@@ -165,15 +165,15 @@ def _process_inlines(tokens, state) {
         if continue_outer continue
       }
 
-      if canOpen {
+      if can_open {
         stack.append({
           token: i,
           pos: t_index,
-          single: isSingle,
-          level: thisLevel,
+          single: is_single,
+          level: this_level,
         })
-      } else if canClose and isSingle {
-        token.content = _replaceAt(token.content, t_index, APOSTROPHE)
+      } else if can_close and is_single {
+        token.content = _replace_at(token.content, t_index, APOSTROPHE)
       }
     }
   }
@@ -182,14 +182,14 @@ def _process_inlines(tokens, state) {
 def smartquotes(state) {
   if !state.md.options.typographer return
 
-  iter var blkIdx = state.tokens.length() - 1; blkIdx >= 0; blkIdx-- {
+  iter var blk_idx = state.tokens.length() - 1; blk_idx >= 0; blk_idx-- {
 
-    if state.tokens[blkIdx].type != 'inline' or
-        !state.tokens[blkIdx].content.match(QUOTE_RE) {
+    if state.tokens[blk_idx].type != 'inline' or
+        !state.tokens[blk_idx].content.match(QUOTE_RE) {
       continue
     }
 
-    _process_inlines(state.tokens[blkIdx].children, state)
+    _process_inlines(state.tokens[blk_idx].children, state)
   }
 }
 

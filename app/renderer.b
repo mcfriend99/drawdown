@@ -1,40 +1,40 @@
-import .common.utils { assign, unescapeAll, escapeHtml }
+import .common.utils { assign, unescape_all, escape_html }
 
 var default_rules = {}
 
 default_rules.code_inline = @(tokens, idx, options, env, slf) {
   var token = tokens[idx]
 
-  return  '<code' + slf.renderAttrs(token) + '>' +
-          escapeHtml(token.content) +
+  return  '<code' + slf.render_attrs(token) + '>' +
+          escape_html(token.content) +
           '</code>'
 }
 
 default_rules.code_block = @(tokens, idx, options, env, slf) {
   var token = tokens[idx]
 
-  return  '<pre' + slf.renderAttrs(token) + '><code>' +
-          escapeHtml(token.content) +
+  return  '<pre' + slf.render_attrs(token) + '><code>' +
+          escape_html(token.content) +
           '</code></pre>\n'
 }
 
 default_rules.fence = @(tokens, idx, options, env, slf) {
   var token = tokens[idx],
-      info = token.info ? unescapeAll(token.info).trim() : '',
-      langName = '',
-      langAttrs = '',
-      highlighted, i, arr, tmpAttrs, tmpToken
+      info = token.info ? unescape_all(token.info).trim() : '',
+      lang_name = '',
+      lang_attrs = '',
+      highlighted, i, arr, tmp_attrs, tmp_token
 
   if info {
     arr = info.split('/(\s+)/')
-    langName = arr[0]
-    langAttrs = ''.join(arr[2,])
+    lang_name = arr[0]
+    lang_attrs = ''.join(arr[2,])
   }
 
   if options.highlight {
-    highlighted = options.highlight(token.content, langName, langAttrs) or escapeHtml(token.content)
+    highlighted = options.highlight(token.content, lang_name, lang_attrs) or escape_html(token.content)
   } else {
-    highlighted = escapeHtml(token.content)
+    highlighted = escape_html(token.content)
   }
 
   if highlighted.index_of('<pre') == 0 {
@@ -42,30 +42,30 @@ default_rules.fence = @(tokens, idx, options, env, slf) {
   }
 
   # If language exists, inject class gently, without modifying original token.
-  # May be, one day we will add .deepClone() for token and simplify this part, but
+  # May be, one day we will add .deep_clone() for token and simplify this part, but
   # now we prefer to keep things local.
   if info {
-    i        = token.attrIndex('class')
-    tmpAttrs = token.attrs ? token.attrs[,] : []
+    i        = token.attr_index('class')
+    tmp_attrs = token.attrs ? token.attrs[,] : []
 
     if i < 0 {
-      tmpAttrs.append([ 'class', options.langPrefix + langName ])
+      tmp_attrs.append([ 'class', options.lang_prefix + lang_name ])
     } else {
-      tmpAttrs[i] = tmpAttrs[i][,]
-      tmpAttrs[i][1] += ' ' + options.langPrefix + langName
+      tmp_attrs[i] = tmp_attrs[i][,]
+      tmp_attrs[i][1] += ' ' + options.lang_prefix + lang_name
     }
 
     # Fake token just to render attributes
-    tmpToken = {
-      attrs: tmpAttrs
+    tmp_token = {
+      attrs: tmp_attrs
     }
 
-    return  '<pre><code' + slf.renderAttrs(tmpToken) + '>' +
+    return  '<pre><code' + slf.render_attrs(tmp_token) + '>' +
             highlighted +
             '</code></pre>\n'
   }
 
-  return  '<pre><code' + slf.renderAttrs(token) + '>' +
+  return  '<pre><code' + slf.render_attrs(token) + '>' +
           highlighted +
           '</code></pre>\n'
 }
@@ -78,21 +78,21 @@ default_rules.image = @(tokens, idx, options, env, slf) {
   #
   # Replace content with actual value
 
-  token.attrs[token.attrIndex('alt')][1] =
-    slf.renderInlineAsText(token.children, options, env)
+  token.attrs[token.attr_index('alt')][1] =
+    slf.render_inline_as_text(token.children, options, env)
 
-  return slf.renderToken(tokens, idx, options)
+  return slf.render_token(tokens, idx, options)
 }
 
 default_rules.hardbreak = @(tokens, idx, options , env, slf) {
-  return options.xhtmlOut ? '<br />\n' : '<br>\n'
+  return options.xhtml_out ? '<br />\n' : '<br>\n'
 }
 default_rules.softbreak = @(tokens, idx, options , env, slf) {
-  return options.breaks ? (options.xhtmlOut ? '<br />\n' : '<br>\n') : '\n'
+  return options.breaks ? (options.xhtml_out ? '<br />\n' : '<br>\n') : '\n'
 }
 
 default_rules.text = @(tokens, idx , options, env, slf) {
-  return escapeHtml(tokens[idx].content)
+  return escape_html(tokens[idx].content)
 }
 
 
@@ -125,7 +125,7 @@ class Renderer {
    * md.renderer.rules.strong_open  = @() { return '<b>' }
    * md.renderer.rules.strong_close = @() { return '</b>' }
    *
-   * var result = md.renderInline(...)
+   * var result = md.render_inline(...)
    * ```
    *
    * Each rule is called as independent static function with fixed signature:
@@ -133,18 +133,18 @@ class Renderer {
    * ```blade
    * function my_token_render(tokens, idx, options, env, renderer) {
    *   # ...
-   *   return renderedHTML
+   *   return rendered_hTML
    * }
    * ```
    */
   var rules = assign({}, default_rules)
 
   /**
-   * Renderer.renderAttrs(token) -> String
+   * Renderer.render_attrs(token) -> String
    *
    * Render token attributes to string.
    */
-  renderAttrs(token) {
+  render_attrs(token) {
     var i = 0, l, result
   
     if !token.attrs return ''
@@ -152,14 +152,14 @@ class Renderer {
     result = ''
   
     iter l = token.attrs.length(); i < l; i++ {
-      result += ' ' + escapeHtml(to_string(token.attrs[i][0])) + '="' + escapeHtml(to_string(token.attrs[i][1])) + '"'
+      result += ' ' + escape_html(to_string(token.attrs[i][0])) + '="' + escape_html(to_string(token.attrs[i][1])) + '"'
     }
   
     return result
   }
 
   /**
-   * Renderer.renderToken(tokens, idx, options)
+   * Renderer.render_token(tokens, idx, options)
    *
    * Default token renderer. Can be overriden by custom function
    * in [[Renderer#rules]].
@@ -169,10 +169,10 @@ class Renderer {
    * @param {dict} options: params of parser instance
    * @return string
    */
-  renderToken(tokens, idx, options) {
+  render_token(tokens, idx, options) {
     var nextToken,
         result = '',
-        needLf = false,
+        need_lf = false,
         token = tokens[idx]
   
     # Tight list paragraphs
@@ -194,16 +194,16 @@ class Renderer {
     result += (token.nesting == -1 ? '</' : '<') + token.tag
   
     # Encode attributes, e.g. `<img src="foo"`
-    result += self.renderAttrs(token)
+    result += self.render_attrs(token)
   
     # Add a slash for self-closing tags, e.g. `<img src="foo" /`
-    if token.nesting == 0 and options.xhtmlOut {
+    if token.nesting == 0 and options.xhtml_out {
       result += ' /'
     }
   
     # Check if we need to add a newline after this tag
     if token.block {
-      needLf = true
+      need_lf = true
   
       if token.nesting == 1 {
         if idx + 1 < tokens.length() {
@@ -212,24 +212,24 @@ class Renderer {
           if nextToken.type == 'inline' or nextToken.hidden {
             # Block-level tag containing an inline tag.
             #
-            needLf = false
+            need_lf = false
   
           } else if nextToken.nesting == -1 and nextToken.tag == token.tag {
             # Opening tag + closing tag of the same type. E.g. `<li></li>`.
             #
-            needLf = false
+            need_lf = false
           }
         }
       }
     }
   
-    result += needLf ? '>\n' : '>'
+    result += need_lf ? '>\n' : '>'
   
     return result
   }
 
   /**
-   * Renderer.renderInline(tokens, options, env)
+   * Renderer.render_inline(tokens, options, env)
    *
    * The same as [[Renderer.render]], but for single token of `inline` type.
    * 
@@ -238,7 +238,7 @@ class Renderer {
    * @param {dict} env: additional data from parsed input (references, for example)
    * @return string
    */
-  renderInline(tokens, options, env) {
+  render_inline(tokens, options, env) {
     var type,
         result = '',
         rules = self.rules,
@@ -250,7 +250,7 @@ class Renderer {
       if rules.contains(type) {
         result += rules[type](tokens, i, options, env, self)
       } else {
-        result += self.renderToken(tokens, i, options)
+        result += self.render_token(tokens, i, options)
       }
     }
   
@@ -259,9 +259,9 @@ class Renderer {
 
   /** internal
    * 
-   * Renderer.renderInlineAsText(tokens, options, env)
+   * Renderer.render_inline_as_text(tokens, options, env)
    *
-   * Special kludge for image `alt` attributes to conform CommonMark spec.
+   * Special kludge for image `alt` attributes to conform Common_mark spec.
    * Don't try to use it! Spec requires to show `alt` content with stripped markup,
    * instead of simple escaping.
    * 
@@ -270,14 +270,14 @@ class Renderer {
    * @param {dict} env: additional data from parsed input (references, for example)
    * @return string
    */
-  renderInlineAsText(tokens, options, env) {
+  render_inline_as_text(tokens, options, env) {
     var result = '', i = 0
   
     iter var len = tokens.length(); i < len; i++ {
       if tokens[i].type == 'text' {
         result += tokens[i].content
       } else if tokens[i].type == 'image' {
-        result += self.renderInlineAsText(tokens[i].children, options, env)
+        result += self.render_inline_as_text(tokens[i].children, options, env)
       } else if tokens[i].type == 'softbreak' {
         result += '\n'
       }
@@ -306,11 +306,11 @@ class Renderer {
       type = tokens[i].type
   
       if type == 'inline' {
-        result += self.renderInline(tokens[i].children, options, env)
+        result += self.render_inline(tokens[i].children, options, env)
       } else if rules.contains(type) {
         result += rules[type](tokens, i, options, env, self)
       } else {
-        result += self.renderToken(tokens, i, options)
+        result += self.render_token(tokens, i, options)
       }
     }
   

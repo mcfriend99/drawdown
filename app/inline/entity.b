@@ -1,13 +1,13 @@
-# Process html entity - &#123;, &#xAF;, &quot;, ...
+# Process html entity - &#123;, &#xF;, &quot;, ...
 
 import ..common.entities { entities }
-import ..common.utils { isValidEntityCode }
+import ..common.utils { is_valid_entity_code }
 
 var DIGITAL_RE = '/^&#((?:x[a-f0-9]{1,6}|[0-9]{1,7}));/i'
 var NAMED_RE   = '/^&([a-z][a-z0-9]{1,31});/i'
 
 def entity(state, silent) {
-  var ch, code, match, token, pos = state.pos, max = state.posMax
+  var ch, code, match, token, pos = state.pos, max = state.pos_max
 
   if state.src[pos] != '&' return false
 
@@ -17,18 +17,17 @@ def entity(state, silent) {
 
   if ch == '#' {
     match = state.src[pos,].match(DIGITAL_RE)
+
     if match {
-      var match_markup = match[0]
-      var match_length = match_markup.length()
       if !silent {
-        code = match[1][0].lower() == 'x' ? to_number(match[1][1,]) : to_number(match[1])
+        code = match[1][0].lower() == 'x' ? to_number('0' + match[1].lower()) : to_number(match[1])
 
         token         = state.push('text_special', '', 0)
-        token.content = isValidEntityCode(code) ? chr(code) : chr(0xFFFD)
-        token.markup  = match_markup
+        token.content = is_valid_entity_code(code) ? chr(code) : chr(0xFFFD)
+        token.markup  = match[0]
         token.info    = 'entity'
       }
-      state.pos += match_length
+      state.pos += match[0].length()
       return true
     }
   } else {

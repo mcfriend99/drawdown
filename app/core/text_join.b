@@ -7,12 +7,12 @@
 
 def text_join(state) {
   var j = 0, l, tokens, curr, max, last,
-      blockTokens = state.tokens
+      block_tokens = state.tokens
 
-  iter l = blockTokens.length(); j < l; j++ {
-    if blockTokens[j].type != 'inline' continue
+  iter l = block_tokens.length(); j < l; j++ {
+    if block_tokens[j].type != 'inline' continue
 
-    tokens = blockTokens[j].children
+    tokens = block_tokens[j].children
     max = tokens.length()
 
     iter curr = 0; curr < max; curr++ {

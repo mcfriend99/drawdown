@@ -1,8 +1,8 @@
 # Parse link destination
 
-import ..common.utils { unescapeAll }
+import ..common.utils { unescape_all }
 
-def parseLinkDestination(str, start, max) {
+def parse_link_destination(str, start, max) {
   var code, level,
       pos = start,
       result = {
@@ -22,7 +22,7 @@ def parseLinkDestination(str, start, max) {
       if code == '<' return result
       if code == '>' {
         result.pos = pos + 1
-        result.str = unescapeAll(str[start + 1, pos])
+        result.str = unescape_all(str[start + 1, pos])
         result.ok = true
         return result
       }
@@ -71,7 +71,7 @@ def parseLinkDestination(str, start, max) {
   if start == pos return result
   if level != 0 return result
 
-  result.str = unescapeAll(str[start, pos])
+  result.str = unescape_all(str[start, pos])
   result.pos = pos
   result.ok = true
   return result

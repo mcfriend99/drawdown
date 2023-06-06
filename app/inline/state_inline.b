@@ -1,9 +1,9 @@
 # Inline parser state
 
 import ..token as _tkn
-import ..common.utils { isWhiteSpace, isPunctChar, isMdAsciiPunct }
+import ..common.utils { is_white_space, is_punct_char, is_md_ascii_punct }
 
-class StateInline {
+class State_inline {
   
   /**
    * Stores { start: end } pairs. Useful for backtrack
@@ -23,36 +23,36 @@ class StateInline {
 
   # backtick length => last seen position
   var backticks = {}
-  var backticksScanned = false
+  var backticks_scanned = false
 
   /**
    * Counter used to disable inline linkify execution
    * inside <a> and markdown links
    * @type number
    */
-  var linkLevel = 0
+  var link_level = 0
 
   var level = 0
   var pending = ''
-  var pendingLevel = 0
+  var pending_level = 0
   var pos = 0
 
-  StateInline(src, md, env, outTokens) {
+  State_inline(src, md, env, out_tokens) {
     self.src = src
     self.env = env
     self.md = md
-    self.tokens = outTokens
-    self.tokens_meta = [nil] * outTokens.length()
-    self.posMax = self.src.length()
+    self.tokens = out_tokens
+    self.tokens_meta = [nil] * out_tokens.length()
+    self.pos_max = self.src.length()
   }
 
   /**
    * Flush pending text
    */
-  pushPending() {
+  push_pending() {
     var token = _tkn.Token('text', '', 0)
     token.content = self.pending
-    token.level = self.pendingLevel
+    token.level = self.pending_level
     self.tokens.append(token)
     self.pending = ''
     return token
@@ -64,7 +64,7 @@ class StateInline {
    */
   push(type, tag, nesting) {
     if self.pending {
-      self.pushPending()
+      self.push_pending()
     }
   
     var token = _tkn.Token(type, tag, nesting)
@@ -86,7 +86,7 @@ class StateInline {
       token_meta = { delimiters: self.delimiters }
     }
   
-    self.pendingLevel = self.level
+    self.pending_level = self.level
     self.tokens.append(token)
     self.tokens_meta.append(token_meta)
     return token
@@ -97,19 +97,19 @@ class StateInline {
    * it can start an emphasis sequence or end an emphasis sequence.
    * 
    *   - start - position to scan from (it should point at a valid marker)
-   *   - canSplitWord - determine if these markers can be found inside a word
+   *   - can_split_word - determine if these markers can be found inside a word
    */
-  scanDelims(start, canSplitWord) {
-    var pos = start, lastChar, nextChar, count, can_open, can_close,
-        isLastWhiteSpace, isLastPunctChar,
-        isNextWhiteSpace, isNextPunctChar,
+  scan_delims(start, can_split_word) {
+    var pos = start, last_char, nextChar, count, can_open, can_close,
+        is_last_white_space, is_last_punct_char,
+        is_nextWhite_space, is_nextPunct_char,
         left_flanking = true,
         right_flanking = true,
-        max = self.posMax,
+        max = self.pos_max,
         marker = self.src[start]
   
     # treat beginning of the line as a whitespace
-    lastChar = start > 0 ? self.src[start - 1] : ' '
+    last_char = start > 0 ? self.src[start - 1] : ' '
   
     while pos < max and self.src[pos] == marker pos++
   
@@ -118,31 +118,31 @@ class StateInline {
     # treat end of the line as a whitespace
     nextChar = pos < max ? self.src[pos] : ' '
   
-    isLastPunctChar = isMdAsciiPunct(lastChar) or isPunctChar(lastChar)
-    isNextPunctChar = isMdAsciiPunct(nextChar) or isPunctChar(nextChar)
+    is_last_punct_char = is_md_ascii_punct(last_char) or is_punct_char(last_char)
+    is_nextPunct_char = is_md_ascii_punct(nextChar) or is_punct_char(nextChar)
   
-    isLastWhiteSpace = isWhiteSpace(lastChar)
-    isNextWhiteSpace = isWhiteSpace(nextChar)
+    is_last_white_space = is_white_space(last_char)
+    is_nextWhite_space = is_white_space(nextChar)
   
-    if isNextWhiteSpace {
+    if is_nextWhite_space {
       left_flanking = false
-    } else if isNextPunctChar {
-      if !(isLastWhiteSpace or isLastPunctChar) {
+    } else if is_nextPunct_char {
+      if !(is_last_white_space or is_last_punct_char) {
         left_flanking = false
       }
     }
   
-    if isLastWhiteSpace {
+    if is_last_white_space {
       right_flanking = false
-    } else if isLastPunctChar {
-      if !(isNextWhiteSpace or isNextPunctChar) {
+    } else if is_last_punct_char {
+      if !(is_nextWhite_space or is_nextPunct_char) {
         right_flanking = false
       }
     }
   
-    if !canSplitWord {
-      can_open  = left_flanking  and (!right_flanking or isLastPunctChar)
-      can_close = right_flanking and (!left_flanking  or isNextPunctChar)
+    if !can_split_word {
+      can_open  = left_flanking  and (!right_flanking or is_last_punct_char)
+      can_close = right_flanking and (!left_flanking  or is_nextPunct_char)
     } else {
       can_open  = left_flanking
       can_close = right_flanking

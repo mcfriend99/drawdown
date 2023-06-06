@@ -15,22 +15,22 @@ var HTML_SEQUENCES = [
   [ '/${HTML_OPEN_CLOSE_TAG_RE}\\s*$/',  '/^$/', false ],
 ]
 
-def html_block(state, startLine, endLine, silent) {
-  var i, nextLine, token, lineText,
-      pos = state.bMarks[startLine] + state.tShift[startLine],
-      max = state.eMarks[startLine]
+def html_block(state, start_line, end_line, silent) {
+  var i, nextLine, token, line_text,
+      pos = state.b_marks[start_line] + state.t_shift[start_line],
+      max = state.e_marks[start_line]
 
   # if it's indented more than 3 spaces, it should be a code block
-  if state.sCount[startLine] - state.blkIndent >= 4 return false
+  if state.s_count[start_line] - state.blk_indent >= 4 return false
 
   if !state.md.options.html return false
 
   if state.src[pos] != '<' return false
 
-  lineText = state.src[pos, max]
+  line_text = state.src[pos, max]
 
   iter i = 0; i < HTML_SEQUENCES.length(); i++ {
-    if lineText.match(HTML_SEQUENCES[i][0]) break
+    if line_text.match(HTML_SEQUENCES[i][0]) break
   }
 
   if i == HTML_SEQUENCES.length() return false
@@ -40,20 +40,20 @@ def html_block(state, startLine, endLine, silent) {
     return HTML_SEQUENCES[i][2]
   }
 
-  nextLine = startLine + 1
+  nextLine = start_line + 1
 
   # If we are here - we detected HTML block.
   # Let's roll down till block end.
-  if !lineText.match(HTML_SEQUENCES[i][1]) {
-    iter ; nextLine < endLine; nextLine++ {
-      if state.sCount[nextLine] < state.blkIndent break
+  if !line_text.match(HTML_SEQUENCES[i][1]) {
+    iter ; nextLine < end_line; nextLine++ {
+      if state.s_count[nextLine] < state.blk_indent break
 
-      pos = state.bMarks[nextLine] + state.tShift[nextLine]
-      max = state.eMarks[nextLine]
-      lineText = state.src[pos, max]
+      pos = state.b_marks[nextLine] + state.t_shift[nextLine]
+      max = state.e_marks[nextLine]
+      line_text = state.src[pos, max]
 
-      if lineText.match(HTML_SEQUENCES[i][1]) {
-        if lineText.length() != 0 nextLine++
+      if line_text.match(HTML_SEQUENCES[i][1]) {
+        if line_text.length() != 0 nextLine++
         break
       }
     }
@@ -62,8 +62,8 @@ def html_block(state, startLine, endLine, silent) {
   state.line = nextLine
 
   token         = state.push('html_block', '', 0)
-  token.map     = [ startLine, nextLine ]
-  token.content = state.getLines(startLine, nextLine, state.blkIndent, true)
+  token.map     = [ start_line, nextLine ]
+  token.content = state.get_lines(start_line, nextLine, state.blk_indent, true)
 
   return true
 }
